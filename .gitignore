@@ -34,7 +34,7 @@ typings/
 
 # Next.js build output
 .next
-
+/out/
 
 # The JSON "database" is created at runtime and belongs to each machine
 data/
@@ -69,3 +69,23 @@ service-account*.json
 *.credentials.json
 .netrc
 .npmrc
+
+
+# Some Next.js default .gitignore contents are included below
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
