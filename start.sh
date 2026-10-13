@@ -96,7 +96,7 @@ command -v npm >/dev/null 2>&1 || die "npm is not installed, but Node.js is. Rei
 
 [ -f package.json ] || die "no package.json here. Run this script from inside the project folder."
 
-[ -f .env ] || die ".env is missing. Create it using .env.example."
+# [ -f .env ] || die ".env is missing. Create it using .env.example."
 
 # Install dependencies on the first run, and again when they change (which is
 # what happens right after a git pull).
