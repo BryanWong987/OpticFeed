@@ -26,11 +26,11 @@ scp -i ~/(path to key)/mykey.pem -r deploy ubuntu@<PUBLIC-IP>:~
 ```
 ssh -i ~/(path to key)/mykey.pem ubuntu@<PUBLIC-IP>
 ```
-4. Run the EC2 setup script once connected to your EC2 instance:
+4. Run the EC2 setup script on your EC2 instance terminal:
 ```
 sudo bash deploy/setup-ec2.sh
 ```
-5. Run deploy.sh (using WSL if on Windows) with the command:
+5. Run deploy.sh on your local machine (using WSL if on Windows) with the command:
 ```
 ./deploy/deploy.sh -h <PUBLIC-IP> -i ~/(path to key)/mykey.pem
 ```
