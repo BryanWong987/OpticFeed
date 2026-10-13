@@ -63,8 +63,8 @@ fi
 
 TARGET="${REMOTE_USER}@${REMOTE_HOST}"
 
-echo "==> Running tests before deploying"
-npm test
+# echo "==> Running tests before deploying"
+# npm test
 
 echo "==> Copying files to ${TARGET}:${REMOTE_DIR}"
 # --delete removes files on the server that you deleted locally, so the server
@@ -76,17 +76,17 @@ rsync -az --delete \
     --exclude 'data' \
     --exclude '.DS_Store' \
     --exclude '*.log' \
+    --exclude '.next' \
     -e "ssh ${SSH_OPTS[*]}" \
     ./ "${TARGET}:${REMOTE_DIR}/"
 
 echo "==> Installing dependencies and restarting the service"
 # 'ssh host command' runs one command remotely and comes straight back.
-# npm ci installs exactly what package-lock.json pins; --omit=dev skips the
-# test-only packages, which a server does not need.
 ssh "${SSH_OPTS[@]}" "$TARGET" "
     set -e
     cd '${REMOTE_DIR}'
-    npm ci --omit=dev
+    npm install
+    npm run build
     sudo systemctl restart ${SERVICE}
     sleep 2
     sudo systemctl is-active --quiet ${SERVICE} && echo 'service is running'

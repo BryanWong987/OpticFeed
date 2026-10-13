@@ -1,11 +1,3 @@
-#!/bin/bash
-
-# Define database credentials and configuration
-DB_USER="root"
-DB_PASS="your_secure_password"
-DB_HOST="localhost"
-DB_NAME="company_db"
-
 # Execute the MySQL commands using a Heredoc
 mysql -h "\$DB_HOST" -u "\(DB_USER" -p"\)DB_PASS" <<EOF
 
@@ -65,9 +57,3 @@ CREATE TABLE comments (
 INSERT INTO accounts (username, email, password) VALUES
 ('admin', 'admin@admin.com', 'vaz2t45rbha2'),
 ('CoolUser123', 'john.doe@example.com', 'j24tgfde23g41ja'),
-
--- 5. Optional verification printout to the terminal
-SELECT 'Table successfully created! Current records:' AS '';
-SELECT user_id, username, email, FROM accounts;
-
-EOF

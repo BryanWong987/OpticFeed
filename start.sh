@@ -23,7 +23,7 @@
 set -euo pipefail
 
 # The package.json "engines" field asks for this too. Keep the two in step.
-REQUIRED_NODE_MAJOR=24
+REQUIRED_NODE_MAJOR=22
 
 DEV_MODE="false"
 PORT_OVERRIDE=""
@@ -64,6 +64,8 @@ while [ $# -gt 0 ]; do
             case "$2" in
                 ''|*[!0-9]*) die "--port needs a number, got '$2'" ;;
             esac
+            [ "$2" -ge 1 ] && [ "$2" -le 65535 ] \
+                || die "Port must be between 1 and 65535."
             PORT_OVERRIDE="$2"
             shift 2
             ;;
@@ -94,6 +96,8 @@ command -v npm >/dev/null 2>&1 || die "npm is not installed, but Node.js is. Rei
 
 [ -f package.json ] || die "no package.json here. Run this script from inside the project folder."
 
+[ -f .env ] || die ".env is missing. Create it using .env.example."
+
 # Install dependencies on the first run, and again when they change (which is
 # what happens right after a git pull).
 #
@@ -111,16 +115,7 @@ elif [ ! -f "$INSTALL_MARKER" ] || [ package-lock.json -nt "$INSTALL_MARKER" ]; 
     npm install
 fi
 
-# --- 
-TODO check mysql installation, and download if not there
-TODO also check for mysql server if running or not
-
-if dpkg -s mysql-server >/dev/null 2>&1; then
-    echo "MySQL server is installed."
-else
-    echo "MySQL server is not installed."
-fi
-# sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server
+# TODO setup MySQL database and populate tables with initial data
 
 
 # --- start ------------------------------------------------------------------
@@ -132,13 +127,14 @@ if [ -n "$PORT_OVERRIDE" ]; then
 fi
 
 PORT_IN_USE="${PORT_OVERRIDE:-3000}"
-say "Starting on http://localhost:${PORT_IN_USE} -- press Ctrl+C to stop"
+say "Starting Next.js on http://localhost:${PORT_IN_USE} -- press Ctrl+C to stop"
 
 if [ "$DEV_MODE" = "true" ]; then
     say "Dev mode: the server restarts when you save a file"
     # exec replaces this shell with node, so Ctrl+C reaches node directly
     # instead of killing this wrapper and orphaning the server.
-    exec node --watch server/server.js
+    exec npm run dev -- --port "${PORT_IN_USE}"
 fi
 
-exec node server/server.js
+npm run build
+exec npm run start -- --port "${PORT_IN_USE}"

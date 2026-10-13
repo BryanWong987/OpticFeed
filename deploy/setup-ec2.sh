@@ -24,8 +24,8 @@ set -euo pipefail
 
 APP_NAME="optic-feed"
 APP_DIR="/opt/optic-feed"
-APP_USER="user123"
-NODE_MAJOR="24"
+APP_USER="user1234"
+NODE_MAJOR="22"
 
 # The directory this script lives in, so it can find the files next to it no
 # matter where it was called from.
@@ -73,7 +73,7 @@ esac
 say "Detected ${PRETTY_NAME:-$ID} (package manager: $PKG)"
 
 # --- packages ---------------------------------------------------------------
-
+# todo install mysql here
 say "Installing Node.js ${NODE_MAJOR} and nginx"
 
 if [ "$PKG" = "dnf" ]; then
@@ -85,7 +85,7 @@ else
     apt-get update -y
     apt-get install -y ca-certificates curl gnupg rsync
     curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash -
-    apt-get install -y nodejs nginx
+    apt-get install -y nodejs nginx 
 fi
 
 say "Node $(node --version), npm $(npm --version)"
@@ -104,21 +104,18 @@ fi
 
 say "Creating $APP_DIR"
 
-mkdir -p "$APP_DIR/data"
+mkdir -p "$APP_DIR"
+# mkdir -p "$APP_DIR/data"
 
 # The person deploying owns the code directory so they can rsync into it.
 # The service account owns the data directory because that is the only place
 # the running app has to write.
 chown -R "$DEPLOY_USER:$APP_USER" "$APP_DIR"
-chown -R "$APP_USER:$APP_USER" "$APP_DIR/data"
-chmod 750 "$APP_DIR"
-chmod 770 "$APP_DIR/data"
+# chown -R "$APP_USER:$APP_USER" "$APP_DIR/data"
+# chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+chmod 770 "$APP_DIR"
+# chmod 770 "$APP_DIR/data"
 
-# Start with an empty todo list if this is a brand new server.
-if [ ! -f "$APP_DIR/data/todos.json" ]; then
-    echo '[]' > "$APP_DIR/data/todos.json"
-    chown "$APP_USER:$APP_USER" "$APP_DIR/data/todos.json"
-fi
 
 # --- systemd ----------------------------------------------------------------
 
@@ -132,7 +129,7 @@ systemctl enable "$APP_NAME"
 
 say "Configuring nginx as a reverse proxy on port 80"
 
-install -m 644 "$SCRIPT_DIR/nginx-todo.conf" "/etc/nginx/conf.d/${APP_NAME}.conf"
+install -m 644 "$SCRIPT_DIR/nginx-optic-feed.conf" "/etc/nginx/conf.d/${APP_NAME}.conf"
 
 # Ubuntu ships a default site that also claims port 80. Two default servers on
 # one port is an error, so remove theirs.
