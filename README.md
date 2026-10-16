@@ -4,7 +4,11 @@
 ## Running the Project
 This project requires:
 - Node.js (version 22+)
+- MySQL 8.0.46 (ensure the "mysql" command is recognized in a terminal): Installation guide [here.](https://dev.mysql.com/doc/mysql-getting-started/en/)
+
+
 - WSL with an Ubuntu instance, if your machine is on Windows (only if deploying on EC2). This is used for recognizing rsync in deploy.sh.
+
 ### Running Locally (localhost)
 1. Clone this repository on your machine
 2. Open a terminal (WSL or Git Bash for Windows) and navigate to this project directory

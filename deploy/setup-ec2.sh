@@ -73,7 +73,6 @@ esac
 say "Detected ${PRETTY_NAME:-$ID} (package manager: $PKG)"
 
 # --- packages ---------------------------------------------------------------
-# todo install mysql here
 say "Installing Node.js ${NODE_MAJOR} and nginx"
 
 if [ "$PKG" = "dnf" ]; then
@@ -105,16 +104,10 @@ fi
 say "Creating $APP_DIR"
 
 mkdir -p "$APP_DIR"
-# mkdir -p "$APP_DIR/data"
 
 # The person deploying owns the code directory so they can rsync into it.
-# The service account owns the data directory because that is the only place
-# the running app has to write.
 chown -R "$DEPLOY_USER:$APP_USER" "$APP_DIR"
-# chown -R "$APP_USER:$APP_USER" "$APP_DIR/data"
-# chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 chmod 770 "$APP_DIR"
-# chmod 770 "$APP_DIR/data"
 
 
 # --- systemd ----------------------------------------------------------------
@@ -162,7 +155,7 @@ fi
 
 cat <<EOF
 
-==> Server setup is complete.
+==> Server setup is complete!
 
 The app is registered but not running yet, because no code has been deployed.
 From your laptop, in the project folder, run:

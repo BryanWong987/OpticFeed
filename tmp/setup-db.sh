@@ -44,7 +44,7 @@ CREATE TABLE comments (
     parent_id int,
     post_id int NOT NULL,
     user_id int NOT NULL,
-    comment_body VARCHAR(2000) NOT NULL
+    comment_body VARCHAR(2000) NOT NULL,
 
     CONSTRAINT fkey_comments
         FOREIGN KEY (parent_id) REFERENCES comments(comment_id),

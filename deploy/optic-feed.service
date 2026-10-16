@@ -2,11 +2,11 @@
 # restarts them when they crash, so your app keeps running after you close your
 # SSH session.
 #
-# setup-ec2.sh copies this to /etc/systemd/system/todo-app.service.
+# setup-ec2.sh copies this to /etc/systemd/system/optic-feed.service.
 # Useful commands once it is installed:
-#   sudo systemctl status todo-app     # is it running?
-#   sudo systemctl restart todo-app    # restart after a deploy
-#   journalctl -u todo-app -f          # follow the logs
+#   sudo systemctl status optic-feed     # is it running?
+#   sudo systemctl restart optic-feed    # restart after a deploy
+#   journalctl -u optic-feed -f          # follow the logs
 [Unit]
 Description=A Social Media Website
 After=network.target

@@ -12,9 +12,12 @@
 #   ./start.sh --help       show this message
 #
 # This is for development. On a server, systemd starts the app instead --
-# see deploy/setup-ec2.sh and deploy/todo-app.service.
+# see deploy/setup-ec2.sh and deploy/optic-feed.service.
 #
-# Works on macOS and Linux.
+# Works on macOS and Linux. On Windows, Git Bash can be used for this script,
+# but it is recommended to use WSL with an Ubuntu instance if issues occur
+
+
 
 # Bash "strict mode": stop on the first error (-e), stop on an undefined
 # variable (-u), and let a failure anywhere in a pipeline fail the whole
@@ -96,6 +99,8 @@ command -v npm >/dev/null 2>&1 || die "npm is not installed, but Node.js is. Rei
 
 [ -f package.json ] || die "no package.json here. Run this script from inside the project folder."
 
+# TODO uncomment later once a MySQL database is setup, also update readme to add
+# database credentials in a .env file.
 # [ -f .env ] || die ".env is missing. Create it using .env.example."
 
 # Install dependencies on the first run, and again when they change (which is
@@ -120,8 +125,6 @@ fi
 
 # --- start ------------------------------------------------------------------
 
-# PORT is read by server/server.js. Exporting it here is the same mechanism
-# systemd uses on the EC2 server, just with a different value.
 if [ -n "$PORT_OVERRIDE" ]; then
     export PORT="$PORT_OVERRIDE"
 fi

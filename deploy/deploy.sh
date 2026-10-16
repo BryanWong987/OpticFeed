@@ -8,8 +8,8 @@
 #   ./deploy/deploy.sh -h 54.12.34.56 -i ~/keys/webdev.pem
 #
 # What it does:
-#   1. rsync the source to /opt/todo-app on the server (node_modules, .git and
-#      your local data file are left behind).
+#   1. rsync the source to /opt/optic-feed on the server (node_modules, .git,
+#      .nexxt, and your local data file are left behind).
 #   2. Install production dependencies there.
 #   3. Restart the systemd service.
 #
@@ -17,7 +17,7 @@
 #   -h HOST   public IP or DNS name of the instance   (required)
 #   -i KEY    path to your .pem private key           (optional if ssh-agent has it)
 #   -u USER   SSH login user (default: ubuntu; use 'ec2-user' for Amazon Linux)
-#   -d DIR    remote directory (default: /opt/todo-app)
+#   -d DIR    remote directory (default: /opt/optic-feed)
 
 set -euo pipefail
 
@@ -69,7 +69,7 @@ TARGET="${REMOTE_USER}@${REMOTE_HOST}"
 echo "==> Copying files to ${TARGET}:${REMOTE_DIR}"
 # --delete removes files on the server that you deleted locally, so the server
 # is an exact mirror of your source. The excludes keep local-only things out:
-# node_modules is rebuilt on the server, and data/ belongs to the server.
+# node_modules and .next is rebuilt on the server, and data/ belongs to the server.
 rsync -az --delete \
     --exclude '.git' \
     --exclude 'node_modules' \
