@@ -2,32 +2,85 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Hello World
+    // <div className="flex flex-col flex-3 items-center justify-center bg-zinc-200 font-sans dark:bg-black">
+    <main className="min-h-screen bg-white px-4 py-12">
+      <div className="mx-auto max-w-xl">
+        <p className="font-bold text-2xl">
+          Stay on top of current news.
+        </p>
+        <p className="font-bold text-2xl">
+          See all perspectives.
+        </p>
+        <p className="font-bold text-2xl">
+          Discuss with locals.
+        </p>
+
+        <p className="text-sm py-4">
+          Login to start connecting with your community today.
+        </p>
+
+        <button
+          aria-label="Login Button"
+          className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Login/Sign Up
+        </button>
+
+
+
+      </div>
+
+
+
+
+      <h1 className="text-2xl font-bold text-center px-4 py-4">Trending Posts</h1>
+      <div className="mx-auto max-w-3xl flex">
+        <article className="box-content h-30 w-3xl border-3 p-2">
+          <h1 className="max-w-base text-2xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+            Death Row Inmate Survives Execution Sentence
           </h1>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <p className="max-w-base text-sm tracking-tight text-black dark:text-zinc-50">
+            Christa Pike was sentenced to death by lethal injection for murder. However, she survived
+            and is now recovering in the hospital in critical condition.
+          </p>
+        </article>
+      </div>
+
+      <div className="px-4 py-16"></div>
+
+
+      <h1 className="text-2xl font-bold text-center px-4 py-4">Local Topics</h1>
+      <div className="mx-auto max-w-3xl flex">
+        <article className="box-content h-30 w-3xl border-3 p-2">
+          <h1 className="max-w-base text-2xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+            Nampa Tennis Club
+          </h1>
+          <p className="max-w-base text-sm tracking-tight text-black dark:text-zinc-50">
+            All ages are welcome!
+          </p>
+        </article>
+      </div>
+
+      <div className="px-4 py-8"></div>
+
+      <div className="mx-auto max-w-xl">
+        <p className="font-bold text-2xl text-center">Suggest a Topic</p>
+        <p className="text-sm text-center px-2 py-4">
+          Is your topic not listed here? Feel free to suggest a topic of interest!
+        </p>
+
+        <div className="flex justify-center">
+          <button
+            aria-label="Suggest Topic Button"
+            className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            Documentation
-          </a>
+            Suggest a Topic
+          </button>
         </div>
-      </main>
-    </div>
+      </div>
+
+
+    </main>
+    // </div>
   );
 }
