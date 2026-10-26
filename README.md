@@ -5,18 +5,21 @@
 This project requires:
 - Node.js (version 22+)
 - MySQL 8.0.46 (ensure the "mysql" command is recognized in a terminal): Installation guide [here.](https://dev.mysql.com/doc/mysql-getting-started/en/)
-
+- Homebrew (if using MacOS)
 
 - WSL with an Ubuntu instance, if your machine is on Windows (only if deploying on EC2). This is used for recognizing rsync in deploy.sh.
 
 ### Running Locally (localhost)
-1. Clone this repository on your machine
-2. Open a terminal (WSL or Git Bash for Windows) and navigate to this project directory
-2. Run this project by calling the script:
+1. Ensure MySQL Server is configured to run as a Windows service with name "MySQL80" (if on Windows).
+2. Clone this repository on your machine
+3. Open a terminal (WSL or Git Bash for Windows) and navigate to this project directory
+4. Run this project by calling the script:
 ```
 ./start.sh
 ```
-4. Navigate to http://localhost:3000 on a browser.
+NOTE: The script must be run as an administrator (once) in order to start the MySQL server.
+
+5. Navigate to http://localhost:3000 on a browser.
 
 See start.sh for a list of optional parameters, such as setting the port number.
 

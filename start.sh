@@ -49,6 +49,65 @@ usage() {
     exit 0
 }
 
+start_mysql() {
+    local os="unknown"
+
+    # Detect the operating system
+    case "$(uname -s)" in
+        Linux*)
+            os="linux"
+            ;;
+        Darwin*)
+            os="macos"
+            ;;
+        MINGW*|MSYS*)
+            os="windows"
+            ;;
+        *)
+            echo "Unsupported OS: $(uname -s)" >&2
+            return 1
+            ;;
+    esac
+
+    echo "Detected OS: $os"
+
+    # Start MySQL using the appropriate service manager
+    case "$os" in
+        linux)
+            if command -v systemctl >/dev/null 2>&1; then
+                if systemctl list-unit-files mysql.service \
+                    --no-legend 2>/dev/null | grep -q mysql.service; then
+                    sudo systemctl start mysql
+                else
+                    sudo systemctl start mysqld
+                fi
+            else
+                echo "systemctl is unavailable." >&2
+                return 1
+            fi
+            ;;
+
+        macos)
+            if command -v brew >/dev/null 2>&1; then
+                brew services start mysql
+            else
+                echo "Homebrew not found. Start MySQL manually." >&2
+                return 1
+            fi
+            ;;
+
+        windows)
+            if sc.exe query "MySQL80" | grep -q "RUNNING"; then
+                echo "MySQL Server (MySQL80) is already running, skipping server startup."
+            elif net start MySQL80; then
+                echo "MySQL started successfully!"
+            else
+                echo "Could not start MySQL. Try running Git Bash as Administrator."
+                return 1
+            fi
+    esac
+}
+
 # --- options ----------------------------------------------------------------
 
 # getopts (the shell builtin) only handles single-letter flags, so the long
@@ -99,9 +158,29 @@ command -v npm >/dev/null 2>&1 || die "npm is not installed, but Node.js is. Rei
 
 [ -f package.json ] || die "no package.json here. Run this script from inside the project folder."
 
-# TODO uncomment later once a MySQL database is setup, also update readme to add
-# database credentials in a .env file.
-# [ -f .env ] || die ".env is missing. Create it using .env.example."
+command -v mysqld 2>&1 || die "MySQL Server is not installed. Install MySQL Server as instructed in the README."
+
+
+# Create .env with a random password on first run
+if [ ! -f .env ]; then
+echo ".env is missing, creating a new .env file with default values"
+  # Generates random 64-character string for the password
+  password="$(node -p 'require("crypto").randomBytes(32).toString("hex")')"
+
+  cat > .env <<EOF
+DB_HOST=localhost
+DB_NAME=optic_feed
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=${password}
+EOF
+
+  echo ".env creation complete. Be sure to change these values later for better security!"
+
+else 
+echo ".env file found! Using variables provided in .env"
+fi
+
 
 # Install dependencies on the first run, and again when they change (which is
 # what happens right after a git pull).
@@ -122,6 +201,12 @@ fi
 
 # TODO setup MySQL database and populate tables with initial data
 
+# Start the MySQL server and create the database
+echo "Starting the MySQL Server..."
+start_mysql
+
+echo "Server started. Now creating the database and populating with sample data."
+npm run seed
 
 # --- start ------------------------------------------------------------------
 

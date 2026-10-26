@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -19,12 +20,14 @@ export default function Home() {
           Login to start connecting with your community today.
         </p>
 
-        <button
-          aria-label="Login Button"
-          className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Login/Sign Up
-        </button>
+        <Link href="/login">
+          <button
+            aria-label="Login Button"
+            className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Login/Sign Up
+          </button>
+        </Link>
 
 
 

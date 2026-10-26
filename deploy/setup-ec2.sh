@@ -73,21 +73,21 @@ esac
 say "Detected ${PRETTY_NAME:-$ID} (package manager: $PKG)"
 
 # --- packages ---------------------------------------------------------------
-say "Installing Node.js ${NODE_MAJOR} and nginx"
+say "Installing Node.js ${NODE_MAJOR}, nginx, and MySQL"
 
 if [ "$PKG" = "dnf" ]; then
     dnf -y update
     # NodeSource publishes newer Node versions than the distro repositories do.
     curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MAJOR}.x" | bash -
-    dnf -y install nodejs nginx rsync
+    dnf -y install nodejs nginx rsync mysql-server
 else
     apt-get update -y
     apt-get install -y ca-certificates curl gnupg rsync
     curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash -
-    apt-get install -y nodejs nginx 
+    apt-get install -y nodejs nginx mysql-server
 fi
 
-say "Node $(node --version), npm $(npm --version)"
+say "Node $(node --version), npm $(npm --version), MySQL Server $(mysqld --version)"
 
 # --- service account and directories ----------------------------------------
 
