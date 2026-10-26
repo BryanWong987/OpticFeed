@@ -141,6 +141,7 @@ nginx -t
 systemctl enable nginx
 systemctl restart nginx
 
+systemctl enable mysql
 # --- firewall ---------------------------------------------------------------
 
 # EC2 security groups are the firewall that matters, but Ubuntu images sometimes

@@ -87,6 +87,7 @@ ssh "${SSH_OPTS[@]}" "$TARGET" "
     cd '${REMOTE_DIR}'
     npm install
     npm run build
+    sudo systemctl restart mysql
     sudo systemctl restart ${SERVICE}
     sleep 2
     sudo systemctl is-active --quiet ${SERVICE} && echo 'service is running'
