@@ -24,6 +24,13 @@ let connectionParams = {
 export async function GET(request: Request) {
     try {
         // 2. connect to database
+        console.log("Host: ", process.env.DB_HOST)
+        console.log("port: ", process.env.DB_PORT)
+        console.log("user: ", process.env.DB_USER)
+        console.log("password: ", process.env.DB_PASSWORD)
+        console.log("database: ", process.env.DB_NAME)
+        console.log("Host: ", process.env.DB_HOST)
+
 
         const connection = await mysql.createConnection(connectionParams)
 

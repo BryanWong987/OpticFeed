@@ -82,12 +82,14 @@ rsync -az --delete \
 
 echo "==> Installing dependencies and restarting the service"
 # 'ssh host command' runs one command remotely and comes straight back.
+# Copies .env file in EC2 to project directory
 ssh "${SSH_OPTS[@]}" "$TARGET" "
     set -e
+    cp ~/.env ${REMOTE_DIR}
     cd '${REMOTE_DIR}'
     npm install
     npm run build
-    sudo systemctl restart mysql
+    npm run seed
     sudo systemctl restart ${SERVICE}
     sleep 2
     sudo systemctl is-active --quiet ${SERVICE} && echo 'service is running'

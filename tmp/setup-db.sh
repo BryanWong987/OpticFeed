@@ -9,7 +9,7 @@ USE \`$DB_NAME\`;
 DROP TABLE IF EXISTS accounts;
 
 -- 3. Create the table structure
-CREATE TABLE accounts (
+CREATE TABLE IF NOT EXISTS accounts (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(20) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE accounts (
     img_path VARCHAR(200)
 );
 
-CREATE TABLE topics (
+CREATE TABLE IF NOT EXISTS topics (
     topic_id INT AUTO_INCREMENT PRIMARY KEY,
     topic_type VARCHAR(20) NOT NULL,
     title VARCHAR(100) UNIQUE NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE topics (
     topic_body VARCHAR(2000)
 );
 
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     topic_id int NOT NULL,
     creator_id int NOT NULL,
@@ -35,11 +35,15 @@ CREATE TABLE posts (
     views INT NOT NULL,
     comments int NOT NULL,
     post_body VARCHAR(2000) NOT NULL,
+
     CONSTRAINT fkey_topics
-        FOREIGN KEY (topic_id) REFERENCES topics(topic_id)
+        FOREIGN KEY (topic_id) REFERENCES topics(topic_id),
+
+    CONSTRAINT fkey_post_creator
+        FOREIGN KEY (creator_id) REFERENCES accounts(user_id)
 );
 
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     comment_id INT AUTO_INCREMENT PRIMARY KEY,
     parent_id int,
     post_id int NOT NULL,
@@ -50,7 +54,10 @@ CREATE TABLE comments (
         FOREIGN KEY (parent_id) REFERENCES comments(comment_id),
 
     CONSTRAINT fkey_posts
-        FOREIGN KEY (post_id) REFERENCES posts(post_id)
+        FOREIGN KEY (post_id) REFERENCES posts(post_id),
+
+    CONSTRAINT fkey_comment_user
+    FOREIGN KEY (user_id) REFERENCES accounts(user_id)
 );
 
 -- 4. Insert sample data rows

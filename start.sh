@@ -171,7 +171,7 @@ echo ".env is missing, creating a new .env file with default values"
 DB_HOST=localhost
 DB_NAME=optic_feed
 DB_PORT=3306
-DB_USER=root
+DB_USER=admin
 DB_PASSWORD=${password}
 EOF
 
