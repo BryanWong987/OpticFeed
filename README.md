@@ -11,9 +11,11 @@ This project requires:
 
 ### Running Locally (localhost)
 1. Ensure MySQL Server is configured to run as a Windows service with name "MySQL80" (if on Windows).
-2. Clone this repository on your machine
-3. Open a terminal (WSL or Git Bash for Windows) and navigate to this project directory
-4. Run this project by calling the script:
+2. Setup MySQL Server so it contains a named database for this project and an account to manage the server.
+3. Create a .env file containing your user credentials and MySQL Server configurations (see .env.example for values to fill in)
+4. Clone this repository on your machine
+5. Open a terminal (WSL or Git Bash for Windows) and navigate to this project directory
+6. Run this project by calling the script:
 ```
 ./start.sh
 ```
@@ -21,7 +23,7 @@ NOTE: The script must be run as an administrator (once) in order to start the My
 
 5. Navigate to http://localhost:3000 on a browser.
 
-See start.sh for a list of optional parameters, such as setting the port number.
+See start.sh for a list of optional parameters, such as setting the port number for the website to run on.
 
 ### Running with Amazon EC2 instance
 1. Clone this repository on your machine

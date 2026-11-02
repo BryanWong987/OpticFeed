@@ -2,6 +2,7 @@ import Link from "next/link";
 // import { connection } from '@/app/lib/db';
 import { revalidatePath } from 'next/cache';
 import SignupForm from '../components/signup-form';
+import LoginForm from '../components/login-form';
 import mysql, { RowDataPacket } from "mysql2/promise";
 
 interface Account extends RowDataPacket {
@@ -63,7 +64,13 @@ export default async function ItemsPage() {
 
   return (
     <main className="min-h-screen bg-white px-4 py-12">
-      <SignupForm />
+      <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-8 md:grid-cols-2">
+
+        <LoginForm />
+        
+        <SignupForm />
+
+      </div>
 
       {/* <ul className="flex-col box-border border-3">
         {accounts.map((account) => (

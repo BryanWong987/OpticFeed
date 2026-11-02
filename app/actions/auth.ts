@@ -1,6 +1,6 @@
 "use server";
 
-import { SignupFormSchema, FormState } from '@/app/lib/definitions'
+import { SignupFormSchema, LoginFormSchema, FormState } from '@/app/lib/definitions'
 import bcrypt from 'bcrypt';
 // import { connection } from '@/app/lib/db';
 import { z } from 'zod';
@@ -41,6 +41,38 @@ export async function signup(state: FormState, formData: FormData) {
     //         message: 'An error occurred while creating your account.',
     //     }
     // }
+    // TODO:
+    // 4. Create user session
+    // 5. Redirect user
+}
+
+export async function login(state: FormState, formData: FormData) {
+    // Validate form fields
+    const validatedFields = SignupFormSchema.safeParse({
+        username: formData.get('username'),
+        password: formData.get('password'),
+    });
+
+    // If any form fields are invalid, return early
+    if (!validatedFields.success) {
+        const tree = z.treeifyError(validatedFields.error);
+
+        return {
+            errors: {
+                username: tree.properties?.username,
+                password: tree.properties?.password,
+            },
+        }
+    }
+
+    // 2. Prepare data for insertion into database
+    const { username, password } = validatedFields.data;
+    // Hash the user's password before storing it
+    
+
+    // TODO to login, use bcrypt.compare
+
+
     // TODO:
     // 4. Create user session
     // 5. Redirect user
