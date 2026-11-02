@@ -1,4 +1,8 @@
-# Execute the MySQL commands using a Heredoc
+
+
+# NOTE: This file is only used as a reference for the database schema
+# This script is not used in any setup and is basically just a text file
+
 mysql -h "\$DB_HOST" -u "\(DB_USER" -p"\)DB_PASS" <<EOF
 
 -- 1. Create the database if it doesn't exist
@@ -22,6 +26,7 @@ CREATE TABLE IF NOT EXISTS topics (
     topic_id INT AUTO_INCREMENT PRIMARY KEY,
     topic_type VARCHAR(20) NOT NULL,
     title VARCHAR(100) UNIQUE NOT NULL,
+    slug VARCHAR(150) UNIQUE NOT NULL,
     status VARCHAR(10) NOT NULL,
     interested_count INT,
     topic_body VARCHAR(2000)
