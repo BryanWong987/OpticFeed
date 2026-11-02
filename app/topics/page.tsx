@@ -1,5 +1,6 @@
 import pool from "@/app/lib/db";
 import Link from "next/link";
+import { Suspense } from "react";
 
 type Status = "pending" | "approved";
 
@@ -14,7 +15,21 @@ interface Topic {
     body: string;
 }
 
-export default async function TopicsList() {
+export default async function Topics() {
+    return (
+            <main className="max-w-3xl mx-auto p-6">
+                <h1 className="text-3xl font-bold mb-6">
+                    Search News
+                </h1>
+    
+                <Suspense fallback={<p>Loading search results...</p>}>
+                    <TopicsList/>
+                </Suspense>
+            </main>
+        );
+}
+
+async function TopicsList() {
     const [rows] = await pool.execute(
         "SELECT * FROM topics ORDER BY topic_id DESC"
     );
@@ -22,11 +37,7 @@ export default async function TopicsList() {
     const topics = rows as Topic[];
 
     return (
-        <main className="max-w-3xl mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">
-                Latest Topics
-            </h1>
-            
+        <>
             <div className="space-y-4">
                 {topics.map((topic) => (
                     <Link
@@ -40,6 +51,6 @@ export default async function TopicsList() {
                     </Link>
                 ))}
             </div>
-        </main>
+        </>
     );
 }

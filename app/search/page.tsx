@@ -1,10 +1,11 @@
+import { Suspense } from "react";
 import pool from "@/app/lib/db";
 import Link from "next/link";
 
 type Status = "pending" | "approved"; // Status of the topic
 
 interface Topic {
-    id: number;
+    topic_id: number;
     type: string;
     title: string;
     slug: string; // slug of topic title (ex. title-in-slug-format)
@@ -14,6 +15,24 @@ interface Topic {
 }
 
 export default async function SearchPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string }>;
+}) {
+    return (
+        <main className="max-w-3xl mx-auto p-6">
+            <h1 className="text-3xl font-bold mb-6">
+                Search News
+            </h1>
+
+            <Suspense fallback={<p>Loading search results...</p>}>
+                <SearchResults searchParams={searchParams} />
+            </Suspense>
+        </main>
+    );
+}
+
+async function SearchResults({
     searchParams,
 }: {
     searchParams: Promise<{ q?: string }>;
@@ -37,10 +56,7 @@ export default async function SearchPage({
     }
 
     return (
-        <main className="max-w-3xl mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">
-                Search Topics
-            </h1>
+        <>
 
             <form action="/search" method="GET" className="mb-8">
                 <input
@@ -77,7 +93,7 @@ export default async function SearchPage({
                 <div className="space-y-4">
                     {topics.map((topic) => (
                         <Link
-                            key={topic.id}
+                            key={topic.topic_id}
                             href={`/news/${topic.slug}`}
                             className="block p-4 border rounded-lg hover:bg-gray-50"
                         >
@@ -92,6 +108,6 @@ export default async function SearchPage({
                     ))}
                 </div>
             )}
-        </main>
+        </>
     );
 }

@@ -1,20 +1,35 @@
+
+import { Suspense } from "react";
 import pool from "@/app/lib/db";
 import { notFound } from "next/navigation";
 
-type Status = "pending" | "approved"; // Status of the topic
+type Status = "pending" | "approved";
 
-// TODO change interface field names to match database field names
 interface Topic {
-    id: number;
+    topic_id: number;
     type: string;
-    title: string; 
+    title: string;
     slug: string; // slug of topic title (ex. title-in-slug-format)
     status: Status;
     interested_count: number;
     topic_body: string;
 }
 
-export default async function TopicPage({
+export default function NewsPage({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}) {
+    return (
+        <main className="max-w-3xl mx-auto p-6">
+            <Suspense fallback={<p>Loading topic...</p>}>
+                <TopicContent params={params} />
+            </Suspense>
+        </main>
+    );
+}
+
+async function TopicContent({
     params,
 }: {
     params: Promise<{ slug: string }>;
@@ -26,26 +41,23 @@ export default async function TopicPage({
         [slug]
     );
 
-    const topic = rows as Topic[];
+    const articles = rows as Topic[];
 
-    // Check whether the article exists
-    if (topic.length === 0) {
+    if (articles.length === 0) {
         notFound();
     }
 
-    const article = topic[0];
+    const article = articles[0];
 
     return (
-        <main className="max-w-3xl mx-auto p-6">
-            <article className="bg-white shadow-md rounded-lg p-6">
-                <h1 className="text-3xl font-bold mb-4">
-                    {article.title}
-                </h1>
+        <article className="bg-white shadow-md rounded-lg p-6">
+            <h1 className="text-3xl font-bold mb-4">
+                {article.title}
+            </h1>
 
-                <p className="text-gray-700 whitespace-pre-wrap">
-                    {article.topic_body}
-                </p>
-            </article>
-        </main>
+            <p className="text-gray-700 whitespace-pre-wrap">
+                {article.topic_body}
+            </p>
+        </article>
     );
 }
