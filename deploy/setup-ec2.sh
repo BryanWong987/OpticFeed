@@ -87,7 +87,7 @@ else
     apt-get install -y nodejs nginx mysql-server
 fi
 
-say "Node $(node --version), npm $(npm --version), MySQL Server $(mysqld --version)"
+say "Node $(node --version), npm $(npm --version), 'MySQL Server $(mysqld --version)'"
 
 # --- service account and directories ----------------------------------------
 
@@ -178,6 +178,7 @@ FLUSH PRIVILEGES;
 
 USE \`${DB_NAME}\`;
 
+DROP TABLE comments, posts, topics, accounts;
 
 CREATE TABLE IF NOT EXISTS accounts (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -192,6 +193,7 @@ CREATE TABLE IF NOT EXISTS topics (
     topic_id INT AUTO_INCREMENT PRIMARY KEY,
     topic_type VARCHAR(20) NOT NULL,
     title VARCHAR(100) UNIQUE NOT NULL,
+    slug VARCHAR(150) UNIQUE NOT NULL,
     status VARCHAR(10) NOT NULL,
     interested_count INT,
     topic_body VARCHAR(2000)
@@ -267,5 +269,6 @@ Handy commands on this server:
     sudo systemctl status $APP_NAME
     journalctl -u $APP_NAME -f
     sudo systemctl restart $APP_NAME
+    sudo systemctl (start/restart/stop/status) mysql
 
 EOF
