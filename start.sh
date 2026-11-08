@@ -177,6 +177,74 @@ EOF
 
   echo ".env creation complete. Be sure to change these values later for better security!"
 
+  echo "Creating MySQL user and database from the generated .env file"
+  export $(echo $(grep -v '^#' .env | xargs))
+  sudo mysql <<EOF
+CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
+CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
+FLUSH PRIVILEGES;
+
+USE \`${DB_NAME}\`;
+
+DROP TABLE comments, posts, topics, accounts;
+
+CREATE TABLE IF NOT EXISTS accounts (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(20) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    preferences VARCHAR(1000),
+    img_path VARCHAR(200)
+);
+
+CREATE TABLE IF NOT EXISTS topics (
+    topic_id INT AUTO_INCREMENT PRIMARY KEY,
+    topic_type VARCHAR(20) NOT NULL,
+    title VARCHAR(100) UNIQUE NOT NULL,
+    slug VARCHAR(150) UNIQUE NOT NULL,
+    status VARCHAR(10) NOT NULL,
+    interested_count INT,
+    topic_body VARCHAR(2000)
+);
+
+CREATE TABLE IF NOT EXISTS posts (
+    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    topic_id int NOT NULL,
+    creator_id int NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    views INT NOT NULL,
+    comments int NOT NULL,
+    post_body VARCHAR(2000) NOT NULL,
+
+    CONSTRAINT fkey_topics
+        FOREIGN KEY (topic_id) REFERENCES topics(topic_id),
+
+    CONSTRAINT fkey_post_creator
+        FOREIGN KEY (creator_id) REFERENCES accounts(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    parent_id int,
+    post_id int NOT NULL,
+    user_id int NOT NULL,
+    comment_body VARCHAR(2000) NOT NULL,
+
+    CONSTRAINT fkey_comments
+        FOREIGN KEY (parent_id) REFERENCES comments(comment_id),
+
+    CONSTRAINT fkey_posts
+        FOREIGN KEY (post_id) REFERENCES posts(post_id),
+
+    CONSTRAINT fkey_comment_user
+    FOREIGN KEY (user_id) REFERENCES accounts(user_id)
+);
+EOF
+
+say "Database '${DB_NAME}' and user '${DB_USER}' configured successfully!"
+say "Database 'Created accounts, posts, comments, and topics tables"
+
 else 
 echo ".env file found! Using variables provided in .env"
 fi

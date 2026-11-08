@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import pool from "@/app/lib/db";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -30,6 +31,9 @@ export default async function Topics() {
 }
 
 async function TopicsList() {
+    // Tell Next.js to wait for an incoming request before querying the database
+    await connection();
+
     const [rows] = await pool.execute(
         "SELECT * FROM topics ORDER BY topic_id DESC"
     );

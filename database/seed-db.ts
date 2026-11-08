@@ -81,8 +81,8 @@ export async function seedTopics() {
         if (insertSampleData) {
             // TODO catch seeding failures if the same data already exists (and proceed to seed next data)
 
-            // await connection.query(`INSERT INTO topics (topic_type, title, slug, status, interested_count, topic_body) 
-            // VALUES ('Informative', 'Death Row', 'death-row', 'Published', '1617', 'Topic relating to death row news.');`);
+            await connection.query(`INSERT INTO topics (topic_type, title, slug, status, interested_count, topic_body) 
+            VALUES ('Informative', 'Death Row', 'death-row', 'Published', '1617', 'Topic relating to death row news.');`);
 
             await connection.query(`INSERT INTO topics (topic_type, title, slug, status, interested_count, topic_body) 
             VALUES ('Networking', 'Indie Gamers', 'indie-gamers', 'Published', '581', 'Looking for fellow indie gamers? You have found your place!');`);
