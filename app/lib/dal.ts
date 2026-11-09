@@ -124,7 +124,7 @@ export async function addTopic(
     const [result] = await pool.execute<ResultSetHeader>(
         `INSERT INTO topics (topic_type, title, slug, status, interested_count, topic_body)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [topic_type, title, title_slug, "Published", 0, topic_body]
+        [topic_type, title, title_slug, status, interested_count, topic_body]
     );
 
     return result.insertId;
