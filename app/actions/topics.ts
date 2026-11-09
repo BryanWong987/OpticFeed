@@ -53,9 +53,13 @@ export async function submitTopic(
     }
 
     const { title, topic_type, topic_body } = validatedFields.data;
-
+    
     try {
-        await addTopic(user.user_id, title, topic_type, "Published", topic_body);
+        if (topic_type === "Informative") {
+            await addTopic(user.user_id, title, topic_type, "Pending", 0, topic_body);
+        } else { // Networking
+            await addTopic(user.user_id, title, topic_type, "Published", null, topic_body);
+        }
     } catch (error) {
         console.error("Failed to submit topic:", error);
 

@@ -115,6 +115,7 @@ export async function addTopic(
     title: string,
     topic_type: "Networking" | "Informative",
     status: "Pending" | "Published",
+    interested_count: number | null,
     topic_body: string
 ): Promise<number> {
     const title_slug = toSlug(title);
