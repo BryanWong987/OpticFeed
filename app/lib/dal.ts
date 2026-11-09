@@ -3,7 +3,7 @@ import 'server-only';
 
 import pool from '@/app/lib/db';
 import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
-import { getSession } from '@/app/lib/session';
+import { verifySession } from '@/app/lib/session';
 
 // User account information returned to the application.
 export interface Account {
@@ -97,17 +97,46 @@ export async function addAccount(
 // Retrieve the currently authenticated account.
 export async function getCurrentUser(): Promise<Account | null> {
 
-    const session = await getSession();
+    const session = await verifySession();
 
-    if (!session?.userId) {
+    if (!session.isAuth || !session.userId) {
         return null;
     }
 
-    const user_id = Number(session.userId);
+    // Retrieve the account from MySQL.
+    const user = await getUserById(session.userId);
 
-    if (!Number.isSafeInteger(user_id) || user_id <= 0) {
-        return null;
-    }
+    return user;
+}
 
-    return getUserById(user_id);
+// Add a topic to the topics database
+export async function addTopic(
+    userId: number,
+    title: string,
+    topic_type: "Networking" | "Informative",
+    status: "Pending" | "Published",
+    topic_body: string
+): Promise<number> {
+    const title_slug = toSlug(title);
+
+
+    const [result] = await pool.execute<ResultSetHeader>(
+        `INSERT INTO topics (topic_type, title, slug, status, interested_count, topic_body)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [topic_type, title, title_slug, "Published", 0, topic_body]
+    );
+
+    return result.insertId;
+}
+
+
+// Function to transform a string into slug format
+// Useful in creating dynamic news links
+function toSlug(text: string): string {
+    return text
+        .toLowerCase()
+        .trim()                                // Remove leading/trailing whitespace
+        .replace(/[^\w\s-]/g, "")             // Remove all non-word characters (except spaces and dashes)
+        .replace(/[\s_]+/g, "-")              // Replace spaces, underscores, and consecutive whitespace with a single dash
+        .replace(/^-+|-+$/g, "");             // Remove any leftover leading or trailing dashes
 }

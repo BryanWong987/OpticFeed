@@ -11,12 +11,16 @@ if (!secretKey) {
 
 const encodedKey = new TextEncoder().encode(secretKey);
 
-export async function createSession(userId: string | number) {
+// Create a new authenticated session.
+export async function createSession(user_id: number) {
+
     const expiresAt = new Date(
         Date.now() + 7 * 24 * 60 * 60 * 1000
     );
 
-    const session = await new SignJWT({ userId: String(userId) })
+    const session = await new SignJWT({
+        userId: String(user_id),
+    })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
         .setExpirationTime('7d')
@@ -33,23 +37,56 @@ export async function createSession(userId: string | number) {
     });
 }
 
-export async function getSession() {
+
+// Verify the session and return its user ID.
+export async function verifySession(): Promise<{
+    isAuth: boolean;
+    userId: number | null;
+}> {
+
     const cookieStore = await cookies();
     const session = cookieStore.get('session')?.value;
 
-    if (!session) return null;
+    if (!session) {
+        return {
+            isAuth: false,
+            userId: null,
+        };
+    }
 
     try {
-        const { payload } = await jwtVerify(session, encodedKey, {
-            algorithms: ['HS256'],
-        });
+        const { payload } = await jwtVerify(
+            session,
+            encodedKey,
+            {
+                algorithms: ['HS256'],
+            }
+        );
 
-        return payload;
+        const userId = Number(payload.userId);
+
+        if (!Number.isSafeInteger(userId) || userId <= 0) {
+            return {
+                isAuth: false,
+                userId: null,
+            };
+        }
+
+        return {
+            isAuth: true,
+            userId,
+        };
+
     } catch {
-        return null;
+        // Invalid or expired session.
+        return {
+            isAuth: false,
+            userId: null,
+        };
     }
 }
 
+// Delete the session cookie.
 export async function deleteSession() {
     const cookieStore = await cookies();
     cookieStore.delete('session');

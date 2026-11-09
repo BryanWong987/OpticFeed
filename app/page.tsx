@@ -73,12 +73,14 @@ export default function Home() {
         </p>
 
         <div className="flex justify-center">
-          <button
-            aria-label="Suggest Topic Button"
-            className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Suggest a Topic
-          </button>
+          <Link href="/create-topic">
+            <button
+              aria-label="Suggest Topic Button"
+              className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Suggest a Topic
+            </button>
+          </Link>
         </div>
       </div>
 

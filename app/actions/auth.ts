@@ -17,7 +17,7 @@ import {
     getUserByUsername
 } from '@/app/lib/dal';
 
-import { createSession } from '@/app/lib/session';
+import { createSession, deleteSession } from '@/app/lib/session';
 
 
 export async function signup(
@@ -137,4 +137,10 @@ export async function login(
 
     // 6. Redirect after successful login.
     redirect('/');
+}
+
+export async function logout() {
+    await deleteSession();
+
+    redirect('/login');
 }

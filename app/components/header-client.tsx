@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { logout } from "@/app/actions/auth";
 
-export default function Header() {
+interface HeaderClientProps {
+    username: string | null;
+}
+
+export default function HeaderClient({ username }: HeaderClientProps) {
     const [query, setQuery] = useState("");
     const router = useRouter();
 
@@ -53,19 +58,41 @@ export default function Header() {
                         Topics (temporary)
                     </Link>
 
-                    <Link
-                        href="/login"
-                        className="text-gray-600 hover:text-blue-600"
-                    >
-                        Login
-                    </Link>
+                    {username ? (
+                        <>
+                            <Link
+                                href="/settings"
+                                className="text-gray-600 hover:text-blue-600"
+                            >
+                                {username}
+                            </Link>
 
-                    <Link
-                        href="/settings"
-                        className="text-gray-600 hover:text-blue-600"
-                    >
-                        Settings
-                    </Link>
+                            <form action={logout}>
+                                <button
+                                    type="submit"
+                                    className="text-gray-600 hover:text-blue-600"
+                                >
+                                    Logout
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <>
+                            <Link
+                                href="/login"
+                                className="text-gray-600 hover:text-blue-600"
+                            >
+                                Login
+                            </Link>
+
+                            <Link
+                                href="/settings"
+                                className="text-gray-600 hover:text-blue-600"
+                            >
+                                Settings
+                            </Link>
+                        </>
+                    )}
                 </div>
             </nav>
         </header>
