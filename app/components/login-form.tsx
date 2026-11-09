@@ -25,26 +25,25 @@ export default function LoginForm() {
 
                     {/* Email */}
                     <div>
-                        <label
-                            htmlFor="email"
-                            className="mb-2 block text-sm font-medium text-gray-700"
-                        >
-                            Email Address
+                        <label htmlFor="username" className="mb-2 block text-sm font-medium text-gray-700">
+                            Username
                         </label>
+
                         <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="Enter your email"
+                            id="username"
+                            name="username"
+                            type="text"
+                            placeholder="Enter your username"
                             required
-                            autoComplete="email"
+                            maxLength={20}
                             className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                         />
-                        {/* {state?.errors?.email && (
-                            <p className="mt-2 text-sm text-red-600">
-                                {state.errors.email.errors}
+
+                        {state?.errors?.username && (
+                            <p className="text-red-500 text-sm">
+                                {state.errors.username.errors[0]}
                             </p>
-                        )} */}
+                        )}
                     </div>
 
                     {/* Password */}
@@ -72,11 +71,11 @@ export default function LoginForm() {
                     </div>
 
                     {/* General Login Error */}
-                    {/* {state?.message && (
+                    {state?.message && (
                         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
                             {state.message}
                         </div>
-                    )} */}
+                    )}
 
                     {/* Submit */}
                     <button
@@ -84,7 +83,7 @@ export default function LoginForm() {
                         type="submit"
                         className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {pending ? 'Logging In...' : 'Log In'}
+                        {pending ? 'Logging in...' : 'Log In'}
                     </button>
 
                 </form>

@@ -166,6 +166,7 @@ if [ ! -f .env ]; then
 echo ".env is missing, creating a new .env file with default values"
   # Generates random 64-character string for the password
   password="$(node -p 'require("crypto").randomBytes(32).toString("hex")')"
+  session_secret="$(node -p 'require("crypto").randomBytes(32).toString("hex")')"
 
   cat > .env <<EOF
 DB_HOST=localhost
@@ -173,6 +174,8 @@ DB_NAME=optic_feed
 DB_PORT=3306
 DB_USER=admin
 DB_PASSWORD=${password}
+
+SESSION_SECRET=${session_secret}
 EOF
 
   echo ".env creation complete. Be sure to change these values later for better security!"
@@ -187,7 +190,7 @@ FLUSH PRIVILEGES;
 
 USE \`${DB_NAME}\`;
 
-DROP TABLE comments, posts, topics, accounts;
+DROP TABLE IF EXISTS comments, posts, topics, accounts;
 
 CREATE TABLE IF NOT EXISTS accounts (
     user_id INT AUTO_INCREMENT PRIMARY KEY,

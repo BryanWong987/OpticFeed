@@ -13,13 +13,15 @@ const pool = mysql.createPool({
 
 export default pool;
 
-// Create table if it doesn't exist yet
-// connection.exec(`
-//   CREATE TABLE IF NOT EXISTS accounts (
-//     id INTEGER PRIMARY KEY AUTOINCREMENT,
-//     username TEXT NOT NULL UNIQUE,
-//     email TEXT NOT NULL UNIQUE,
-//     password TEXT NOT NULL,
-//     role TEXT
-//   )
-// `);
+// Reuse the pool during Next.js development hot reloads.
+// declare global {
+//   var mysqlPool: mysql.Pool | undefined;
+// }
+
+// const db = globalThis.mysqlPool ?? pool;
+
+// if (process.env.NODE_ENV !== 'production') {
+//   globalThis.mysqlPool = db;
+// }
+
+// export default db;

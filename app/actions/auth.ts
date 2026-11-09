@@ -1,22 +1,37 @@
-"use server";
 
-import { SignupFormSchema, LoginFormSchema, FormState } from '@/app/lib/definitions'
+'use server';
+
+import {
+    SignupFormSchema,
+    LoginFormSchema,
+    SignupState,
+    LoginState
+} from '@/app/lib/definitions';
+
 import bcrypt from 'bcrypt';
-// import { connection } from '@/app/lib/db';
 import { z } from 'zod';
-import { revalidatePath } from 'next/cache';
-import mysql from 'mysql2/promise';
+import { redirect } from 'next/navigation';
+
+import {
+    addAccount,
+    getUserByUsername
+} from '@/app/lib/dal';
+
+import { createSession } from '@/app/lib/session';
 
 
-export async function signup(state: FormState, formData: FormData) {
-    // Validate form fields
+export async function signup(
+    state: SignupState,
+    formData: FormData
+): Promise<SignupState> {
+
+    // 1. Validate form fields.
     const validatedFields = SignupFormSchema.safeParse({
         username: formData.get('username'),
         email: formData.get('email'),
         password: formData.get('password'),
     });
 
-    // If any form fields are invalid, return early
     if (!validatedFields.success) {
         const tree = z.treeifyError(validatedFields.error);
 
@@ -26,34 +41,62 @@ export async function signup(state: FormState, formData: FormData) {
                 email: tree.properties?.email,
                 password: tree.properties?.password,
             },
-        }
+        };
     }
 
-    // 2. Prepare data for insertion into database
+    // 2. Prepare data.
     const { username, email, password } = validatedFields.data;
-    // Hash the user's password before storing it
-    const hashedPassword = await bcrypt.hash(password, 12);
-    // 3. Insert the user into the database or call an Auth Library's API
-    const user = await addAccount(username, email, hashedPassword);
 
-    // if (!user) {
-    //     return {
-    //         message: 'An error occurred while creating your account.',
-    //     }
-    // }
-    // TODO:
-    // 4. Create user session
-    // 5. Redirect user
+    // 3. Hash the password.
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // 4. Insert the account through the DAL.
+    try {
+        const user_id = await addAccount(
+            username,
+            email,
+            hashedPassword
+        );
+
+        // 5. Create a session.
+        await createSession(user_id);
+
+    } catch (error) {
+        // Handle duplicate username/email errors.
+        if (
+            typeof error === 'object' &&
+            error !== null &&
+            'code' in error &&
+            error.code === 'ER_DUP_ENTRY'
+        ) {
+            return {
+                message: 'Username or email is already registered.',
+            };
+        }
+
+        console.error('Signup error:', error);
+
+        return {
+            message: 'An error occurred while creating your account.',
+        };
+    }
+
+    // 6. Redirect after successful signup.
+    redirect('/');
 }
 
-export async function login(state: FormState, formData: FormData) {
-    // Validate form fields
-    const validatedFields = SignupFormSchema.safeParse({
+
+export async function login(
+    state: LoginState,
+    formData: FormData
+): Promise<LoginState> {
+
+    // 1. Validate form fields.
+    const validatedFields = LoginFormSchema.safeParse({
         username: formData.get('username'),
         password: formData.get('password'),
     });
 
-    // If any form fields are invalid, return early
     if (!validatedFields.success) {
         const tree = z.treeifyError(validatedFields.error);
 
@@ -62,41 +105,36 @@ export async function login(state: FormState, formData: FormData) {
                 username: tree.properties?.username,
                 password: tree.properties?.password,
             },
-        }
+        };
     }
 
-    // 2. Prepare data for insertion into database
+    // 2. Prepare data.
     const { username, password } = validatedFields.data;
-    // Hash the user's password before storing it
-    
 
-    // TODO to login, use bcrypt.compare
+    // 3. Retrieve the account through the DAL.
+    const user = await getUserByUsername(username);
 
+    if (!user) {
+        return {
+            message: 'Invalid username or password.',
+        };
+    }
 
-    // TODO:
-    // 4. Create user session
-    // 5. Redirect user
-}
+    // 4. Verify the password.
+    const validLogin = await bcrypt.compare(
+        password,
+        user.password
+    );
 
+    if (!validLogin) {
+        return {
+            message: 'Invalid username or password.',
+        };
+    }
 
-async function addAccount(username: string, email: string, hash: string) {
-    // 'use server';
-    const connection = await mysql.createPool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '3306'),
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      waitForConnections: true,
-      connectionLimit: 10,
-    });
+    // 5. Create an authenticated session.
+    await createSession(user.user_id);
 
-    // const info = connection.prepare(
-    //     'INSERT INTO accounts (username, email, password) VALUES (?, ?, ?)'
-    // ).run(username, email, hash);
-    
-
-    const result = await connection.execute(
-        'INSERT INTO accounts (username, email, password) VALUES (?, ?, ?)', [username, email, hash]);
-    revalidatePath('/login'); // Refresh the page data
+    // 6. Redirect after successful login.
+    redirect('/');
 }

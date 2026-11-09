@@ -18,7 +18,7 @@ export async function seedAccounts() {
     try {
         const create_accounts_table = `CREATE TABLE IF NOT EXISTS accounts( \
             user_id INT AUTO_INCREMENT PRIMARY KEY, \
-            username VARCHAR(20) NOT NULL, \
+            username VARCHAR(20) UNIQUE NOT NULL, \
             email VARCHAR(100) UNIQUE NOT NULL, \
             password VARCHAR(255) NOT NULL, \
             preferences VARCHAR(1000), \

@@ -150,6 +150,7 @@ if [ -f .env ]; then
 else
     # Create new .env file with random password
     password="$(node -p 'require("crypto").randomBytes(32).toString("hex")')"
+    session_secret="$(node -p 'require("crypto").randomBytes(32).toString("hex")')"
 
     cat > .env <<EOF
 DB_HOST=localhost
@@ -157,6 +158,8 @@ DB_NAME=optic_feed
 DB_PORT=3306
 DB_USER=admin
 DB_PASSWORD=${password}
+
+SESSION_SECRET=${session_secret}
 EOF
 
     say ".env created with db user \"root\" and random hashed password."
@@ -182,7 +185,7 @@ DROP TABLE comments, posts, topics, accounts;
 
 CREATE TABLE IF NOT EXISTS accounts (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(20) NOT NULL,
+    username VARCHAR(20) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     preferences VARCHAR(1000),

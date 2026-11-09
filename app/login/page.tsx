@@ -1,5 +1,5 @@
 import Link from "next/link";
-// import { connection } from '@/app/lib/db';
+import pool from '@/app/lib/db';
 import { revalidatePath } from 'next/cache';
 import SignupForm from '../components/signup-form';
 import LoginForm from '../components/login-form';
@@ -15,15 +15,6 @@ interface Account extends RowDataPacket {
 }
 
 export default async function ItemsPage() {
-  const connection = await mysql.createPool({
-        host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT || '3306'),
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        waitForConnections: true,
-        connectionLimit: 10,
-      });
   
   // Fetch data
   // const [accounts] = await connection.query<Account[]>('SELECT * FROM accounts;');
