@@ -94,7 +94,7 @@ async function SearchResults({
                     {topics.map((topic) => (
                         <Link
                             key={topic.topic_id}
-                            href={`/news/${topic.slug}`}
+                            href={`/topics/${topic.slug}`}
                             className="block p-4 border rounded-lg hover:bg-gray-50"
                         >
                             <h3 className="text-xl font-semibold">

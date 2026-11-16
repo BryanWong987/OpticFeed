@@ -30,7 +30,7 @@ export async function createSession(user_id: number) {
 
     cookieStore.set('session', session, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Allows Http cookies
         expires: expiresAt,
         sameSite: 'lax',
         path: '/',

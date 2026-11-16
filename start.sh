@@ -9,6 +9,7 @@
 #   ./start.sh              start the app on http://localhost:3000
 #   ./start.sh --dev        restart automatically when you save a file
 #   ./start.sh --port 4000  listen somewhere other than port 3000
+#   ./start.sh --seed       clear the tables in the database if applicable, and seeds with sample data
 #   ./start.sh --help       show this message
 #
 # This is for development. On a server, systemd starts the app instead --
@@ -30,6 +31,7 @@ REQUIRED_NODE_MAJOR=22
 
 DEV_MODE="false"
 PORT_OVERRIDE=""
+SEED_DB="false"
 
 # --- helpers ----------------------------------------------------------------
 
@@ -133,6 +135,10 @@ while [ $# -gt 0 ]; do
             ;;
         -h|--help)
             usage
+            ;;
+        -s|--seed)
+            SEED_DB="true"
+            shift
             ;;
         *)
             die "unknown option '$1' (try --help)"
@@ -276,8 +282,13 @@ fi
 echo "Starting the MySQL Server..."
 start_mysql
 
-echo "Server started. Now creating the database and populating with sample data."
-npm run seed
+echo "MySQL Server started."
+
+if [ "$SEED_DB" = "true" ]; then
+    echo "Clearing the current database and populating tables with sample data."
+    npm run seed
+    echo "Database seed complete!"
+fi
 
 # --- start ------------------------------------------------------------------
 
