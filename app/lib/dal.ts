@@ -19,6 +19,35 @@ export interface AuthAccount extends Account {
     password: string;
 }
 
+export interface Post extends RowDataPacket {
+    post_id: number;
+    topic_id: number;
+    creator_id: number;
+    post_type: "News" | "Discussion";
+    news_links: string | null;
+    title: string;
+    num_views: number;
+    num_comments: number;
+    post_body: string;
+
+    // Additional information from JOINs when needed
+    topic_slug: string;
+    topic_title: string;
+    creator_username: string;
+}
+
+
+export interface PostComment extends RowDataPacket {
+    comment_id: number;
+    parent_id: number | null;
+    post_id: number;
+    user_id: number;
+    comment_body: string;
+    username: string;
+}
+
+
+
 // Retrieve an account using its username.
 export async function getUserByUsername(
     username: string
@@ -129,6 +158,152 @@ export async function addTopic(
 
     return result.insertId;
 }
+
+export async function addPost(
+    userId: number,
+    topicId: number,
+    title: string,
+    post_type: "News" | "Discussion",
+    news_links: string | null,
+    post_body: string
+): Promise<number> {
+
+    const [result] = await pool.execute<ResultSetHeader>(
+        `INSERT INTO posts (
+            topic_id,
+            creator_id,
+            post_type,
+            news_links,
+            title,
+            num_views,
+            num_comments,
+            post_body
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+            topicId,
+            userId,
+            post_type,
+            news_links,
+            title,
+            0,
+            0,
+            post_body
+        ]
+    );
+
+    return result.insertId;
+}
+
+// Retrieve a topic using its ID.
+export async function getTopicById(
+    topicId: number
+): Promise<{ topic_id: number; slug: string } | null> {
+
+    const [rows] = await pool.execute<RowDataPacket[]>(
+        `SELECT topic_id, slug
+         FROM topics
+         WHERE topic_id = ?
+         LIMIT 1`,
+        [topicId]
+    );
+
+    if (rows.length === 0) {
+        return null;
+    }
+
+    return {
+        topic_id: Number(rows[0].topic_id),
+        slug: rows[0].slug,
+    };
+}
+
+// Retrieve all posts associated with a topic
+export async function getPostsByTopicId(
+    topicId: number
+): Promise<Post[]> {
+
+    const [rows] = await pool.execute<Post[]>(
+        `SELECT
+            post_id,
+            topic_id,
+            creator_id,
+            post_type,
+            news_links,
+            title,
+            num_views,
+            num_comments,
+            post_body
+         FROM posts
+         WHERE topic_id = ?
+         ORDER BY post_id DESC`,
+        [topicId]
+    );
+
+    return rows;
+}
+
+
+// Retrieve an individual post using its ID and topic slug.
+export async function getPostById(
+    postId: number,
+    topicSlug: string
+): Promise<Post | null> {
+
+    const [rows] = await pool.execute<Post[]>(
+        `SELECT
+            p.post_id,
+            p.topic_id,
+            p.creator_id,
+            p.post_type,
+            p.news_links,
+            p.title,
+            p.num_views,
+            p.num_comments,
+            p.post_body,
+            t.slug AS topic_slug,
+            t.title AS topic_title,
+            a.username AS creator_username
+         FROM posts p
+         INNER JOIN topics t ON p.topic_id = t.topic_id
+         INNER JOIN accounts a ON p.creator_id = a.user_id
+         WHERE p.post_id = ?
+         AND t.slug = ?
+         LIMIT 1`,
+        [postId, topicSlug]
+    );
+
+    if (rows.length === 0) {
+        return null;
+    }
+
+    return rows[0];
+}
+
+// Retrieve top-level comments associated with a post.
+export async function getTopLevelCommentsByPostId(
+    postId: number
+): Promise<PostComment[]> {
+
+    const [rows] = await pool.execute<PostComment[]>(
+        `SELECT
+            c.comment_id,
+            c.parent_id,
+            c.post_id,
+            c.user_id,
+            c.comment_body,
+            a.username
+         FROM comments c
+         INNER JOIN accounts a ON c.user_id = a.user_id
+         WHERE c.post_id = ?
+         AND c.parent_id IS NULL
+         ORDER BY c.comment_id ASC`,
+        [postId]
+    );
+
+    return rows;
+}
+
 
 
 // Function to transform a string into slug format

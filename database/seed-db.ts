@@ -62,7 +62,7 @@ export async function seedTopics(pool: Pool) {
         'Create topics table',
         `CREATE TABLE IF NOT EXISTS topics (
             topic_id INT AUTO_INCREMENT PRIMARY KEY,
-            topic_type VARCHAR(20) NOT NULL,
+            topic_type ENUM('Networking', 'Informative') NOT NULL,
             title VARCHAR(100) UNIQUE NOT NULL,
             slug VARCHAR(150) UNIQUE NOT NULL,
             status VARCHAR(10) NOT NULL,
@@ -114,8 +114,8 @@ export async function seedPosts(pool: Pool) {
             post_id INT AUTO_INCREMENT PRIMARY KEY,
             topic_id int NOT NULL,
             creator_id int NOT NULL,
-            post_type VARCHAR(10) NOT NULL,
-            news_links VARCHAR(500),
+            post_type ENUM('News', 'Discussion') NOT NULL,
+            news_links TEXT,
             title VARCHAR(200) NOT NULL,
             num_views INT NOT NULL,
             num_comments int NOT NULL,
@@ -142,8 +142,8 @@ export async function seedPosts(pool: Pool) {
             'Execution Negligence',
             0,
             0,
-            'I believe there was negligence regarding the Christa Pike \
-            incident. What do you guys think?'
+            `I believe there was negligence regarding the Christa Pike \
+            incident. What do you guys think?`
         ]
     );
 
@@ -160,8 +160,8 @@ export async function seedPosts(pool: Pool) {
             'Should the Death Penalty be legal?',
             0,
             0,
-            'I think there are too many problems that can happen by allowing \
-            the death penalty. What do you guys think?'
+            `I think there are too many problems that can happen by allowing
+            the death penalty. What do you guys think?`
         ]
     );
 }

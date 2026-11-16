@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 CREATE TABLE IF NOT EXISTS topics (
     topic_id INT AUTO_INCREMENT PRIMARY KEY,
-    topic_type VARCHAR(20) NOT NULL,
+    topic_type ENUM('Networking', 'Informative') NOT NULL,
     title VARCHAR(100) UNIQUE NOT NULL,
     slug VARCHAR(150) UNIQUE NOT NULL,
     status VARCHAR(10) NOT NULL,
@@ -36,9 +36,11 @@ CREATE TABLE IF NOT EXISTS posts (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     topic_id int NOT NULL,
     creator_id int NOT NULL,
+    post_type ENUM('News', 'Discussion') NOT NULL,
+    news_links TEXT,
     title VARCHAR(200) NOT NULL,
-    views INT NOT NULL,
-    comments int NOT NULL,
+    num_views INT NOT NULL,
+    num_comments int NOT NULL,
     post_body VARCHAR(2000) NOT NULL,
 
     CONSTRAINT fkey_topics
