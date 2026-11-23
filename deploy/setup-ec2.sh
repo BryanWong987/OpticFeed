@@ -206,13 +206,13 @@ CREATE TABLE IF NOT EXISTS topics (
 
 CREATE TABLE IF NOT EXISTS posts (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
-    topic_id int NOT NULL,
-    creator_id int NOT NULL,
+    topic_id INT NOT NULL,
+    creator_id INT NOT NULL,
     post_type ENUM('News', 'Discussion') NOT NULL,
     news_links TEXT,
     title VARCHAR(200) NOT NULL,
-    num_views INT NOT NULL,
-    num_comments int NOT NULL,
+    num_views INT NOT NULL DEFAULT 0,
+    num_comments INT NOT NULL DEFAULT 0,
     post_body VARCHAR(2000) NOT NULL,
 
     CONSTRAINT fkey_topics
@@ -224,9 +224,9 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE TABLE IF NOT EXISTS comments (
     comment_id INT AUTO_INCREMENT PRIMARY KEY,
-    parent_id int,
-    post_id int NOT NULL,
-    user_id int NOT NULL,
+    parent_id INT,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
     comment_body VARCHAR(2000) NOT NULL,
 
     CONSTRAINT fkey_comments
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS comments (
         FOREIGN KEY (post_id) REFERENCES posts(post_id),
 
     CONSTRAINT fkey_comment_user
-    FOREIGN KEY (user_id) REFERENCES accounts(user_id)
+        FOREIGN KEY (user_id) REFERENCES accounts(user_id)
 );
 EOF
 
