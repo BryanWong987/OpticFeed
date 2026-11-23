@@ -50,8 +50,8 @@ export interface PostComment extends RowDataPacket {
 
 
 
-// Retrieve an account using its username.
-export async function getUserByUsername(
+// Retrieve an account using its username. (includes password)
+export async function getAuthUserByUsername(
     username: string
 ): Promise<AuthAccount | null> {
 
@@ -107,6 +107,56 @@ export async function getUserById(
         preferences: user.preferences,
         img_path: user.img_path,
     };
+}
+
+// Retrieve an account using its user ID, including its password hash.
+// Only use this function in server-side authentication operations.
+export async function getAuthUserById(
+    user_id: number
+): Promise<AuthAccount | null> {
+
+    const [rows] = await pool.execute<RowDataPacket[]>(
+        `SELECT user_id, username, email, password,
+                preferences, img_path
+         FROM accounts
+         WHERE user_id = ?
+         LIMIT 1`,
+        [user_id]
+    );
+
+    if (rows.length === 0) {
+        return null;
+    }
+
+    const user = rows[0];
+
+    return {
+        user_id: Number(user.user_id),
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        preferences: user.preferences,
+        img_path: user.img_path,
+    };
+}
+
+
+// Update an account's password hash.
+export async function updateUserPassword(
+    user_id: number,
+    hashedPassword: string
+): Promise<void> {
+
+    const [result] = await pool.execute<ResultSetHeader>(
+        `UPDATE accounts
+         SET password = ?
+         WHERE user_id = ?`,
+        [hashedPassword, user_id]
+    );
+
+    if (result.affectedRows === 0) {
+        throw new Error("Account not found.");
+    }
 }
 
 // Insert a new account into MySQL.

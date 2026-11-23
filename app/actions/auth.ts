@@ -14,7 +14,7 @@ import { redirect } from 'next/navigation';
 
 import {
     addAccount,
-    getUserByUsername
+    getAuthUserByUsername,
 } from '@/app/lib/dal';
 
 import { createSession, deleteSession } from '@/app/lib/session';
@@ -112,7 +112,7 @@ export async function login(
     const { username, password } = validatedFields.data;
 
     // 3. Retrieve the account through the DAL.
-    const user = await getUserByUsername(username);
+    const user = await getAuthUserByUsername(username);
 
     if (!user) {
         return {

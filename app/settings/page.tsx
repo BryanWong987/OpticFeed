@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/app/lib/dal";
 import AppearanceToggle from "./appearance-toggle";
+import PasswordForm from "./password-form";
 
 export default function SettingsPage() {
     return (
@@ -101,24 +102,7 @@ async function SettingsContent() {
 
                 {/* Account actions */}
                 <div className="divide-y divide-border">
-                    <div className="flex items-center justify-between gap-4 py-5">
-                        <div>
-                            <h3 className="font-medium text-foreground">
-                                Password
-                            </h3>
-                            <p className="text-sm text-muted">
-                                Change your account password.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            disabled
-                            className="shrink-0 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted opacity-70"
-                        >
-                            Reset Password
-                        </button>
-                    </div>
+                    <PasswordForm />
 
                     <div className="flex items-center justify-between gap-4 py-5">
                         <div>
