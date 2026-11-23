@@ -23,7 +23,7 @@ export default function LoginForm() {
 
                 <form action={action} className="space-y-5">
 
-                    {/* Email */}
+                    {/* Username */}
                     <div>
                         <label htmlFor="username" className="mb-2 block text-sm font-medium text-gray-700">
                             Username

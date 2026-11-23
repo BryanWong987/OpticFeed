@@ -1,9 +1,8 @@
-import pool from '@/app/lib/db';
 import bcrypt from 'bcrypt';
 import mysql from 'mysql2/promise';
 import type { Pool } from 'mysql2/promise';
 
-// Execute an individual query without stopping the remaining seed operations.
+// Execute a query. Stop the operation if a query fails.
 async function runQuery(
     pool: Pool,
     description: string,
@@ -16,11 +15,11 @@ async function runQuery(
         return results;
     } catch (error) {
         console.error(`Seed failed (${description}):`, error);
-        return null;
+        throw error;
     }
 }
 
-export async function seedAccounts(pool: Pool) {
+async function seedAccounts(pool: Pool) {
     await runQuery(
         pool,
         'Create accounts table',
@@ -34,15 +33,14 @@ export async function seedAccounts(pool: Pool) {
         )`
     );
 
-
-    const hashPassword = await bcrypt.hash("Password_123", 12);
+    const hashPassword = await bcrypt.hash('Password_123', 12);
 
     await runQuery(
         pool,
         'Insert sample account user123',
         `INSERT INTO accounts (username, email, password)
-            VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE user_id = user_id`,
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE user_id = user_id`,
         ['user123', 'a@example.com', hashPassword]
     );
 
@@ -50,13 +48,13 @@ export async function seedAccounts(pool: Pool) {
         pool,
         'Insert sample account Contrarian',
         `INSERT INTO accounts (username, email, password)
-            VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE user_id = user_id`,
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE user_id = user_id`,
         ['Contrarian', 'c@example.com', hashPassword]
     );
 }
 
-export async function seedTopics(pool: Pool) {
+async function seedTopics(pool: Pool) {
     await runQuery(
         pool,
         'Create topics table',
@@ -76,8 +74,8 @@ export async function seedTopics(pool: Pool) {
         'Insert Death Row topic',
         `INSERT INTO topics
             (topic_type, title, slug, status, interested_count, topic_body)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE topic_id = topic_id`,
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE topic_id = topic_id`,
         [
             'Informative',
             'Death Row',
@@ -93,8 +91,8 @@ export async function seedTopics(pool: Pool) {
         'Insert Indie Gamers topic',
         `INSERT INTO topics
             (topic_type, title, slug, status, interested_count, topic_body)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE topic_id = topic_id`,
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE topic_id = topic_id`,
         [
             'Networking',
             'Indie Gamers',
@@ -106,19 +104,19 @@ export async function seedTopics(pool: Pool) {
     );
 }
 
-export async function seedPosts(pool: Pool) {
+async function seedPosts(pool: Pool) {
     await runQuery(
         pool,
         'Create posts table',
         `CREATE TABLE IF NOT EXISTS posts (
             post_id INT AUTO_INCREMENT PRIMARY KEY,
-            topic_id int NOT NULL,
-            creator_id int NOT NULL,
+            topic_id INT NOT NULL,
+            creator_id INT NOT NULL,
             post_type ENUM('News', 'Discussion') NOT NULL,
             news_links TEXT,
             title VARCHAR(200) NOT NULL,
-            num_views INT NOT NULL,
-            num_comments int NOT NULL,
+            num_views INT NOT NULL DEFAULT 0,
+            num_comments INT NOT NULL DEFAULT 0,
             post_body VARCHAR(2000) NOT NULL,
 
             CONSTRAINT fkey_topics
@@ -129,52 +127,96 @@ export async function seedPosts(pool: Pool) {
         )`
     );
 
+    // Insert only if a post with this title does not already exist
+    // in the Death Row topic.
     await runQuery(
         pool,
-        'Insert post #1 into Death Row topic (created by user123)',
-        `INSERT INTO posts
-            (topic_id, creator_id, title, num_views, num_comments, post_body)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE post_id = post_id`,
-        [
-            1,
-            1,
+        'Insert Execution Negligence post by user123',
+        `INSERT INTO posts (
+            topic_id,
+            creator_id,
+            post_type,
+            news_links,
+            title,
+            num_views,
+            num_comments,
+            post_body
+        )
+        SELECT
+            t.topic_id,
+            a.user_id,
+            'Discussion',
+            NULL,
             'Execution Negligence',
             0,
             0,
-            `I believe there was negligence regarding the Christa Pike \
-            incident. What do you guys think?`
+            ?
+        FROM topics t
+        JOIN accounts a ON a.username = ?
+        WHERE t.slug = ?
+        AND NOT EXISTS (
+            SELECT 1
+            FROM posts p
+            WHERE p.topic_id = t.topic_id
+            AND p.title = ?
+        )`,
+        [
+            'I believe there was negligence regarding the Christa Pike incident. What do you guys think?',
+            'user123',
+            'death-row',
+            'Execution Negligence'
         ]
     );
 
     await runQuery(
         pool,
-        'Insert post #2 into Death Row topic (created by user123)',
-        `INSERT INTO posts
-            (topic_id, creator_id, title, num_views, num_comments, post_body)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE post_id = post_id`,
-        [
-            1,
-            1,
+        'Insert Should the Death Penalty be legal post by user123',
+        `INSERT INTO posts (
+            topic_id,
+            creator_id,
+            post_type,
+            news_links,
+            title,
+            num_views,
+            num_comments,
+            post_body
+        )
+        SELECT
+            t.topic_id,
+            a.user_id,
+            'Discussion',
+            NULL,
             'Should the Death Penalty be legal?',
             0,
             0,
-            `I think there are too many problems that can happen by allowing
-            the death penalty. What do you guys think?`
+            ?
+        FROM topics t
+        JOIN accounts a ON a.username = ?
+        WHERE t.slug = ?
+        AND NOT EXISTS (
+            SELECT 1
+            FROM posts p
+            WHERE p.topic_id = t.topic_id
+            AND p.title = ?
+        )`,
+        [
+            'I think there are too many problems that can happen by allowing the death penalty. What do you guys think?',
+            'user123',
+            'death-row',
+            'Should the Death Penalty be legal?'
         ]
     );
 }
 
-export async function seedComments(pool: Pool) {
+async function seedComments(pool: Pool) {
     await runQuery(
         pool,
         'Create comments table',
         `CREATE TABLE IF NOT EXISTS comments (
             comment_id INT AUTO_INCREMENT PRIMARY KEY,
-            parent_id int,
-            post_id int NOT NULL,
-            user_id int NOT NULL,
+            parent_id INT,
+            post_id INT NOT NULL,
+            user_id INT NOT NULL,
             comment_body VARCHAR(2000) NOT NULL,
 
             CONSTRAINT fkey_comments
@@ -184,41 +226,74 @@ export async function seedComments(pool: Pool) {
                 FOREIGN KEY (post_id) REFERENCES posts(post_id),
 
             CONSTRAINT fkey_comment_user
-            FOREIGN KEY (user_id) REFERENCES accounts(user_id)
+                FOREIGN KEY (user_id) REFERENCES accounts(user_id)
         )`
     );
 
     await runQuery(
         pool,
-        'Insert comment #1 into Execution Negligence post for Death Row topic (created by Contrarian)',
-        `INSERT INTO comments
-            (post_id, user_id, comment_body)
-            VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE comment_id = comment_id`,
+        'Insert comment into Execution Negligence post by Contrarian',
+        `INSERT INTO comments (post_id, user_id, comment_body)
+         SELECT p.post_id, a.user_id, ?
+         FROM posts p
+         JOIN accounts a ON a.username = ?
+         WHERE p.title = ?
+         AND NOT EXISTS (
+             SELECT 1
+             FROM comments c
+             WHERE c.post_id = p.post_id
+             AND c.user_id = a.user_id
+             AND c.comment_body = ?
+         )`,
         [
-            1,
-            2,
+            'No.',
+            'Contrarian',
+            'Execution Negligence',
             'No.'
         ]
     );
 
     await runQuery(
         pool,
-        'Insert comment #1 into Death Penalty Legalization post for Death Row topic (created by Contrarian)',
-        `INSERT INTO comments
-            (post_id, user_id, comment_body)
-            VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE comment_id = comment_id`,
+        'Insert comment into Death Penalty Legalization post by Contrarian',
+        `INSERT INTO comments (post_id, user_id, comment_body)
+         SELECT p.post_id, a.user_id, ?
+         FROM posts p
+         JOIN accounts a ON a.username = ?
+         WHERE p.title = ?
+         AND NOT EXISTS (
+             SELECT 1
+             FROM comments c
+             WHERE c.post_id = p.post_id
+             AND c.user_id = a.user_id
+             AND c.comment_body = ?
+         )`,
         [
-            2,
-            2,
+            'No. Your opinion is horrible',
+            'Contrarian',
+            'Should the Death Penalty be legal?',
             'No. Your opinion is horrible'
         ]
+    );
+
+    // Keep the comment counters synchronized with the actual
+    // number of comments, including replies.
+    await runQuery(
+        pool,
+        'Update post comment counters',
+        `UPDATE posts p
+         SET p.num_comments = (
+             SELECT COUNT(*)
+             FROM comments c
+             WHERE c.post_id = p.post_id
+         )`
     );
 }
 
 
-// Run all seed functions
+// --------------------------------------------------
+// Seed and reset operations
+// --------------------------------------------------
 async function seedDatabase(pool: Pool) {
     await seedAccounts(pool);
     await seedTopics(pool);
@@ -227,30 +302,27 @@ async function seedDatabase(pool: Pool) {
 }
 
 async function resetDatabase(pool: Pool) {
-    await runQuery(
-        pool,
-        'Drop comments table',
-        'DROP TABLE IF EXISTS comments');
-
-    await runQuery(
-        pool,
-        'Drop posts table',
-        'DROP TABLE IF EXISTS posts');
-
-    await runQuery(
-        pool,
-        'Drop topics table',
-        'DROP TABLE IF EXISTS topics');
-
-    await runQuery(
-        pool,
-        'Drop accounts table',
-        'DROP TABLE IF EXISTS accounts');
-    
+    // Drop tables in reverse foreign-key dependency order
+    await runQuery(pool, 'Drop comments table', 'DROP TABLE IF EXISTS comments');
+    await runQuery(pool, 'Drop posts table', 'DROP TABLE IF EXISTS posts');
+    await runQuery(pool, 'Drop topics table', 'DROP TABLE IF EXISTS topics');
+    await runQuery(pool, 'Drop accounts table', 'DROP TABLE IF EXISTS accounts');
 }
 
-
+// --------------------------------------------------
+// Main
+// --------------------------------------------------
 async function main() {
+    const action = process.argv[2];
+
+    if (action !== 'seed' && action !== 'reset') {
+        console.error(
+            'Please specify an action: "seed" or "reset".'
+        );
+        process.exitCode = 1;
+        return;
+    }
+
     const seedPool = mysql.createPool({
         host: process.env.DB_HOST,
         port: parseInt(process.env.DB_PORT || '3306'),
@@ -262,16 +334,19 @@ async function main() {
     });
 
     try {
-        await resetDatabase(seedPool);
+        if (action === 'reset') {
+            console.log('Resetting database...');
+            await resetDatabase(seedPool);
+        }
 
+        console.log('Seeding database...');
         await seedDatabase(seedPool);
 
-        console.log('Database seeding completed successfully!');
+        console.log('Database operation completed successfully!');
     } catch (error) {
-        console.error('Database seeding failed:', error);
+        console.error('Database operation failed:', error);
         process.exitCode = 1;
     } finally {
-        // Close the MySQL connection pool
         await seedPool.end();
         console.log('Database connection pool closed.');
     }

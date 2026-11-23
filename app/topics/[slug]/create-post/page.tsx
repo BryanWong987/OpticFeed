@@ -43,6 +43,8 @@ async function CreatePostContent({
 
     const topic = topics[0];
 
+    // TODO: restrict post creation to only users since it requires a user
+    
     return (
         <section className="rounded-lg bg-white p-6 shadow-md">
             <h1 className="mb-2 text-2xl font-bold">

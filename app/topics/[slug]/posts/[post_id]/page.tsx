@@ -1,6 +1,7 @@
 
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import CommentForm from "@/app/components/comment-form";
 
 import {
     getPostById,
@@ -117,6 +118,13 @@ async function PostContent({ params }: PostPageProps) {
                 <h2 className="mb-5 text-2xl font-bold">
                     Comments ({comments.length})
                 </h2>
+
+                <div className="mb-8 rounded-lg bg-white p-5 shadow-sm">
+                    <CommentForm
+                        postId={post.post_id}
+                        topicSlug={post.topic_slug}
+                    />
+                </div>
 
                 {comments.length === 0 ? (
                     <p className="text-gray-600">

@@ -195,6 +195,43 @@ export async function addPost(
     return result.insertId;
 }
 
+
+export async function addComment(
+    userId: number,
+    postId: number,
+    commentBody: string
+): Promise<number> {
+    const connection = await pool.getConnection();
+
+    try {
+        // Use transaction: comment and post comment counter
+        // increment must both succeed
+        await connection.beginTransaction();
+
+        const [result] = await connection.execute<ResultSetHeader>(
+            `INSERT INTO comments (parent_id, post_id, user_id, comment_body)
+             VALUES (NULL, ?, ?, ?)`,
+            [postId, userId, commentBody]
+        );
+
+        await connection.execute(
+            `UPDATE posts
+             SET num_comments = num_comments + 1
+             WHERE post_id = ?`,
+            [postId]
+        );
+
+        await connection.commit();
+
+        return result.insertId;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
 // Retrieve a topic using its ID.
 export async function getTopicById(
     topicId: number
