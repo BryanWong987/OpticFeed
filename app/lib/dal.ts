@@ -199,19 +199,18 @@ export async function addPost(
 export async function addComment(
     userId: number,
     postId: number,
+    parentId: number | null,
     commentBody: string
 ): Promise<number> {
     const connection = await pool.getConnection();
 
     try {
-        // Use transaction: comment and post comment counter
-        // increment must both succeed
         await connection.beginTransaction();
 
         const [result] = await connection.execute<ResultSetHeader>(
             `INSERT INTO comments (parent_id, post_id, user_id, comment_body)
-             VALUES (NULL, ?, ?, ?)`,
-            [postId, userId, commentBody]
+             VALUES (?, ?, ?, ?)`,
+            [parentId, postId, userId, commentBody]
         );
 
         await connection.execute(
@@ -317,11 +316,10 @@ export async function getPostById(
     return rows[0];
 }
 
-// Retrieve top-level comments associated with a post.
-export async function getTopLevelCommentsByPostId(
+// Retrieve comments associated with a post.
+export async function getCommentsByPostId(
     postId: number
 ): Promise<PostComment[]> {
-
     const [rows] = await pool.execute<PostComment[]>(
         `SELECT
             c.comment_id,
@@ -333,7 +331,6 @@ export async function getTopLevelCommentsByPostId(
          FROM comments c
          INNER JOIN accounts a ON c.user_id = a.user_id
          WHERE c.post_id = ?
-         AND c.parent_id IS NULL
          ORDER BY c.comment_id ASC`,
         [postId]
     );
@@ -341,6 +338,25 @@ export async function getTopLevelCommentsByPostId(
     return rows;
 }
 
+// Get a comment with the given comment id.
+export async function getCommentById(
+    commentId: number
+): Promise<{ comment_id: number; post_id: number } | null> {
+    const [rows] = await pool.execute<RowDataPacket[]>(
+        `SELECT comment_id, post_id
+         FROM comments
+         WHERE comment_id = ?
+         LIMIT 1`,
+        [commentId]
+    );
+
+    if (rows.length === 0) return null;
+
+    return {
+        comment_id: Number(rows[0].comment_id),
+        post_id: Number(rows[0].post_id),
+    };
+}
 
 
 // Function to transform a string into slug format

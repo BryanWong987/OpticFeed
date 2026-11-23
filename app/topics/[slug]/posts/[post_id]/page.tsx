@@ -2,17 +2,54 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import CommentForm from "@/app/components/comment-form";
+import CommentThread from "@/app/components/comment-thread";
 
 import {
     getPostById,
-    getTopLevelCommentsByPostId,
+    getCommentsByPostId,
+    type PostComment,
 } from "@/app/lib/dal";
+
 
 interface PostPageProps {
     params: Promise<{
         slug: string;
         post_id: string;
     }>;
+}
+
+
+interface CommentNode extends PostComment {
+    replies: CommentNode[];
+}
+
+function buildCommentTree(comments: PostComment[]): CommentNode[] {
+    const commentMap = new Map<number, CommentNode>();
+
+    // Create a node for every comment.
+    for (const comment of comments) {
+        commentMap.set(comment.comment_id, {
+            ...comment,
+            replies: [],
+        });
+    }
+
+    const topLevelComments: CommentNode[] = [];
+
+    // Attach each reply to its parent comment.
+    for (const comment of commentMap.values()) {
+        if (comment.parent_id === null) {
+            topLevelComments.push(comment);
+        } else {
+            const parent = commentMap.get(comment.parent_id);
+
+            if (parent) {
+                parent.replies.push(comment);
+            }
+        }
+    }
+
+    return topLevelComments;
 }
 
 export default function PostPage({ params }: PostPageProps) {
@@ -42,8 +79,9 @@ async function PostContent({ params }: PostPageProps) {
         notFound();
     }
 
-    // Retrieve top-level comments.
-    const comments = await getTopLevelCommentsByPostId(post.post_id);
+    // Retrieve comments
+    const allComments = await getCommentsByPostId(post.post_id);
+    const comments = buildCommentTree(allComments);
 
     // Split news links into individual URLs.
     const newsLinks = post.news_links
@@ -116,7 +154,7 @@ async function PostContent({ params }: PostPageProps) {
             {/* Comments */}
             <section>
                 <h2 className="mb-5 text-2xl font-bold">
-                    Comments ({comments.length})
+                    Comments ({allComments.length})
                 </h2>
 
                 <div className="mb-8 rounded-lg bg-white p-5 shadow-sm">
@@ -126,30 +164,11 @@ async function PostContent({ params }: PostPageProps) {
                     />
                 </div>
 
-                {comments.length === 0 ? (
-                    <p className="text-gray-600">
-                        No comments yet. Be the first to comment!
-                    </p>
-                ) : (
-                    <div className="space-y-4">
-                        {comments.map((comment) => (
-                            <article
-                                key={comment.comment_id}
-                                className="rounded-lg bg-white p-5 shadow-sm"
-                            >
-                                {/* Comment Author */}
-                                <p className="mb-2 font-semibold text-gray-800">
-                                    {comment.username}
-                                </p>
-
-                                {/* Comment Body */}
-                                <p className="whitespace-pre-wrap text-gray-700">
-                                    {comment.comment_body}
-                                </p>
-                            </article>
-                        ))}
-                    </div>
-                )}
+                <CommentThread
+                    comments={comments}
+                    postId={post.post_id}
+                    topicSlug={post.topic_slug}
+                />
             </section>
 
         </div>
