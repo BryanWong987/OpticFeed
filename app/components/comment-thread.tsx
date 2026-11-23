@@ -65,7 +65,7 @@ function CommentItem({
 
     return (
         <div className="space-y-3">
-            <article className="rounded-lg bg-white p-5 shadow-sm">
+            <article className="rounded-lg bg-background p-5 shadow-sm">
                 <p className="mb-2 font-semibold text-gray-800">
                     {comment.username}
                 </p>

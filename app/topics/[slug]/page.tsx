@@ -61,7 +61,7 @@ async function TopicContent({
     return (
         <>
             {/* Topic Information */}
-            <article className="rounded-lg bg-white p-6 shadow-md">
+            <article className="rounded-lg bg-background p-6 shadow-md">
                 <h1 className="mb-4 text-3xl font-bold">
                     {article.title}
                 </h1>
@@ -96,7 +96,7 @@ async function TopicContent({
                         {posts.map((post) => (
                             <article
                                 key={post.post_id}
-                                className="rounded-lg bg-white p-6 shadow-md"
+                                className="rounded-lg bg-background p-6 shadow-md"
                             >
                                 {/* Post Type */}
                                 <span className="mb-2 inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">

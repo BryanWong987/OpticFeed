@@ -5,6 +5,8 @@ import pool from '@/app/lib/db';
 import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { verifySession } from '@/app/lib/session';
 
+export type Theme = "light" | "dark";
+
 // User account information returned to the application.
 export interface Account {
     user_id: number;
@@ -136,6 +138,69 @@ export async function getCurrentUser(): Promise<Account | null> {
     const user = await getUserById(session.userId);
 
     return user;
+}
+
+// Read the theme preference from an account's preferences JSON.
+export function getThemeFromPreferences(
+    preferences: string | null
+): Theme {
+    if (!preferences) {
+        return "light";
+    }
+
+    try {
+        const parsed = JSON.parse(preferences);
+
+        return parsed.theme === "dark" ? "dark" : "light";
+    } catch {
+        return "light";
+    }
+}
+
+// Update a user's theme preference.
+export async function updateUserTheme(
+    userId: number,
+    theme: Theme
+): Promise<void> {
+    const [rows] = await pool.execute<RowDataPacket[]>(
+        `SELECT preferences
+         FROM accounts
+         WHERE user_id = ?
+         LIMIT 1`,
+        [userId]
+    );
+
+    if (rows.length === 0) {
+        throw new Error("Account not found.");
+    }
+
+    let preferences: Record<string, unknown> = {};
+
+    if (rows[0].preferences) {
+        try {
+            const parsed = JSON.parse(rows[0].preferences);
+
+            if (
+                parsed !== null &&
+                typeof parsed === "object" &&
+                !Array.isArray(parsed)
+            ) {
+                preferences = parsed;
+            }
+        } catch {
+            // Existing preferences are not valid JSON.
+            // Start with an empty object.
+        }
+    }
+
+    preferences.theme = theme;
+
+    await pool.execute(
+        `UPDATE accounts
+         SET preferences = ?
+         WHERE user_id = ?`,
+        [JSON.stringify(preferences), userId]
+    );
 }
 
 // Add a topic to the topics database

@@ -22,7 +22,7 @@ async function ProtectedTopicForm() {
     }
 
     return (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-background p-8 shadow-sm">
             <h1 className="mb-2 text-3xl font-bold text-gray-900">
                 Suggest a News Topic
             </h1>

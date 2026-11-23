@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
 import Header from "./components/header";
 import Footer from "./components/footer";
+import ThemeProvider from "./components/theme-provider";
+import ThemeProviderWrapper from "./components/theme-provider-wrapper";
+
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -20,30 +24,45 @@ export const metadata: Metadata = {
   description: "A Social Media Website",
 };
 
-// export default function RootLayout({ children }: LayoutProps<"/">) {
-//   return (
-//     <html
-//       lang="en"
-//       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-//     >
-//       <body className="min-h-full flex flex-col">{children}</body>
-//     </html>
-//   );
-// }
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const siteContent = (
+    <>
+      <Suspense
+        fallback={
+          <header className="border-b border-gray-200 bg-gray-200 px-6 py-4">
+            Loading...
+          </header>
+        }
+      >
+        <Header />
+      </Suspense>
 
-export default function RootLayout({ children }: Readonly<{children: React.ReactNode;}>) {
+      <main className="flex-1">
+        {children}
+      </main>
+
+      <Footer />
+    </>
+  );
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
-        <Suspense fallback={<header className="border-b border-gray-200 bg-gray-200 px-6 py-4">Loading...</header>}>
-          <Header />
+        <Suspense
+          fallback={
+            <ThemeProvider initialTheme="light">
+              {siteContent}
+            </ThemeProvider>
+          }
+        >
+          <ThemeProviderWrapper>
+            {siteContent}
+          </ThemeProviderWrapper>
         </Suspense>
-
-        <main className="flex-1">
-          {children}
-        </main>
-
-        <Footer />
       </body>
     </html>
   );

@@ -54,7 +54,7 @@ export default async function ItemsPage() {
   // }
 
   return (
-    <main className="min-h-screen bg-white px-4 py-12">
+    <main className="min-h-screen bg-background px-4 py-12">
       <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-8 md:grid-cols-2">
 
         <LoginForm />

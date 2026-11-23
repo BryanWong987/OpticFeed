@@ -47,7 +47,7 @@ async function TopicsList() {
                     <Link
                         key={topic.topic_id}
                         href={`/topics/${topic.slug}`}
-                        className="block p-4 bg-white shadow rounded-lg hover:bg-gray-100"
+                        className="block p-4 bg-background shadow rounded-lg hover:bg-gray-100"
                     >
                         <h2 className="text-xl font-semibold">
                             {topic.title}

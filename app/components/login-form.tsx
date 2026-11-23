@@ -9,7 +9,7 @@ export default function LoginForm() {
 
     return (
         <div className="w-full">
-            <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+            <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-background p-8 shadow-lg">
 
                 {/* Heading */}
                 <div className="mb-8 text-center">
@@ -36,7 +36,7 @@ export default function LoginForm() {
                             placeholder="Enter your username"
                             required
                             maxLength={20}
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-background focus:ring-2 focus:ring-blue-100"
                         />
 
                         {state?.errors?.username && (
@@ -61,7 +61,7 @@ export default function LoginForm() {
                             placeholder="Enter your password"
                             required
                             autoComplete="current-password"
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-background focus:ring-2 focus:ring-blue-100"
                         />
                         {state?.errors?.password && (
                             <p className="mt-2 text-sm text-red-600">

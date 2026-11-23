@@ -9,7 +9,7 @@ export default function SignupForm() {
 
     return (
         <div className="w-full">
-            <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+            <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-background p-8 shadow-lg">
 
                 {/* Heading */}
                 <div className="mb-8 text-center">
@@ -37,7 +37,7 @@ export default function SignupForm() {
                             type="text"
                             placeholder="Enter your username"
                             required
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-background focus:ring-2 focus:ring-blue-100"
                         />
                         {state?.errors?.username && (
                             <p className="mt-2 text-sm text-red-600">
@@ -60,7 +60,7 @@ export default function SignupForm() {
                             type="email"
                             placeholder="Enter your email"
                             required
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-background focus:ring-2 focus:ring-blue-100"
                         />
                         {state?.errors?.email && (
                             <p className="mt-2 text-sm text-red-600">
@@ -83,7 +83,7 @@ export default function SignupForm() {
                             type="password"
                             placeholder="Create a password"
                             required
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:bg-background focus:ring-2 focus:ring-blue-100"
                         />
                         {state?.errors?.password && (
                             <div className="mt-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">

@@ -92,7 +92,7 @@ async function PostContent({ params }: PostPageProps) {
         <div className="space-y-8">
 
             {/* Post */}
-            <article className="rounded-lg bg-white p-6 shadow-md">
+            <article className="rounded-lg bg-background p-6 shadow-md">
 
                 {/* Parent Topic */}
                 <p className="mb-3 text-sm text-gray-500">
@@ -157,7 +157,7 @@ async function PostContent({ params }: PostPageProps) {
                     Comments ({allComments.length})
                 </h2>
 
-                <div className="mb-8 rounded-lg bg-white p-5 shadow-sm">
+                <div className="mb-8 rounded-lg bg-background p-5 shadow-sm">
                     <CommentForm
                         postId={post.post_id}
                         topicSlug={post.topic_slug}
