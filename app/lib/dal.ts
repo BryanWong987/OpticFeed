@@ -253,6 +253,24 @@ export async function updateUserTheme(
     );
 }
 
+// Update a user's profile picture path.
+export async function updateUserProfilePicture(
+    user_id: number,
+    img_path: string
+): Promise<void> {
+
+    const [result] = await pool.execute<ResultSetHeader>(
+        `UPDATE accounts
+         SET img_path = ?
+         WHERE user_id = ?`,
+        [img_path, user_id]
+    );
+
+    if (result.affectedRows === 0) {
+        throw new Error("Account not found.");
+    }
+}
+
 // Add a topic to the topics database
 export async function addTopic(
     userId: number,

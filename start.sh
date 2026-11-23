@@ -188,6 +188,8 @@ DB_USER=admin
 DB_PASSWORD=${password}
 
 SESSION_SECRET=${session_secret}
+
+PROFILE_UPLOAD_DIR=./uploads/profile-pictures
 EOF
 
   echo ".env creation complete. Be sure to change these values later for better security!"

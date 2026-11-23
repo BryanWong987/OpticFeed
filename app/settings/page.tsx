@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/app/lib/dal";
 import AppearanceToggle from "./appearance-toggle";
 import PasswordForm from "./password-form";
+import ProfilePictureForm from "./profile-picture-form";
 
 export default function SettingsPage() {
     return (
@@ -54,51 +55,10 @@ async function SettingsContent() {
                 </h2>
 
                 {/* Profile picture */}
-                <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-center">
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-secondary">
-                        {user.img_path ? (
-                            <img
-                                src={user.img_path}
-                                alt={`${user.username}'s profile picture`}
-                                className="h-full w-full object-cover"
-                            />
-                        ) : (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                className="h-10 w-10 text-muted"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M20 21a8 8 0 0 0-16 0"
-                                />
-                                <circle cx="12" cy="8" r="4" />
-                            </svg>
-                        )}
-                    </div>
-
-                    <div className="flex-1">
-                        <h3 className="font-medium text-foreground">
-                            {user.username}
-                        </h3>
-                        <p className="text-sm text-muted">
-                            {user.email}
-                        </p>
-
-                        <button
-                            type="button"
-                            disabled
-                            className="mt-3 rounded-md border border-border px-4 py-2 text-sm font-medium text-muted opacity-70"
-                        >
-                            Edit Picture
-                        </button>
-                    </div>
-                </div>
+                <ProfilePictureForm
+                    username={user.username}
+                    imgPath={user.img_path}
+                />
 
                 {/* Account actions */}
                 <div className="divide-y divide-border">

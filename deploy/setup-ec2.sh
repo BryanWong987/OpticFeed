@@ -160,6 +160,8 @@ DB_USER=admin
 DB_PASSWORD=${password}
 
 SESSION_SECRET=${session_secret}
+
+PROFILE_UPLOAD_DIR=${APP_DIR}/uploads/profile-pictures
 EOF
 
     say ".env created with db user \"root\" and random hashed password."
